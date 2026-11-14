@@ -1,0 +1,43 @@
+/* 한국어 줄바꿈 기본값. 다른 스타일시트보다 먼저 불러온다.
+   기본값은 상속으로 내려가고 site.css 의 규칙이 덮는다.
+   text-wrap 단축형은 text-wrap-mode 를 wrap 으로 되돌려 같은 요소의 white-space: nowrap 을 푼다.
+   그래서 요소 규칙에는 장형 text-wrap-style 을 쓰고, 장형을 모르는 브라우저에서만 단축형을 쓴다. */
+
+html {
+  word-break: keep-all;          /* 한국어는 어절 단위로만 끊는다 */
+  overflow-wrap: break-word;     /* 띄어쓰기 없는 긴 덩어리만 상자 안에서 끊는다 */
+  text-wrap-style: pretty;       /* 끝줄에 어절 하나만 남는 일을 줄인다(상속) */
+}
+
+/* 대표 글: 줄 길이를 고르게 */
+h1, h2, h3, h4, h5, h6,
+caption, figcaption, legend, summary, th,
+[role="heading"], .title, .subtitle {
+  text-wrap-style: balance;
+}
+
+/* 본문과 설명 */
+p, li, dd, td, blockquote {
+  text-wrap-style: pretty;
+}
+
+@supports not (text-wrap-style: balance) {
+  html { text-wrap: pretty; }
+  h1, h2, h3, h4, h5, h6,
+  caption, figcaption, legend, summary,
+  [role="heading"], .title, .subtitle { text-wrap: balance; }
+}
+
+/* flex, grid 자식이 긴 토큰 때문에 줄지 못해 넘칠 때 붙이는 보조 클래스 */
+.ko-shrink { min-width: 0; overflow-wrap: anywhere; }
+
+/* 한 덩이로 붙는 것: 숫자와 단위, 배지, 태그, 키 */
+.nowrap, kbd, .badge, .tag, .chip { white-space: nowrap; }
+
+/* 코드, CLI, 경로, URL: 어절 규칙을 끄고 필요할 때만 끊는다 */
+code, samp, pre, .mono {
+  word-break: normal;
+  overflow-wrap: anywhere;
+  text-wrap-style: auto;
+}
+pre { white-space: pre-wrap; }
