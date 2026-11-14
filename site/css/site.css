@@ -576,7 +576,7 @@ html[data-intro="settle"] .hero-art .cell {
   font-size: 0.8125rem;
   font-weight: 480;
   letter-spacing: 0;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 /* ---- 그림 칸 ---- */
@@ -724,6 +724,18 @@ html[data-intro="settle"] .hero-art .cell {
 .term .cm { color: #8B909C; }
 .term-one { font-size: clamp(1.125rem, 3.4vw, 1.5rem); font-weight: 560; }
 
+/* ---- 없는 주소 ---- */
+.lost { min-height: calc(100svh - var(--banner-h)); display: grid; align-items: center; padding-block: 4rem; }
+.lost-code { font-size: 0.9375rem; font-weight: 520; color: var(--ink-2); }
+.lost h1 {
+  margin-top: 0.5rem;
+  font-size: clamp(1.75rem, 4.2vw, 3rem);
+  line-height: 1.24;
+  font-weight: 760;
+  letter-spacing: -0.03em;
+}
+.lost h1 + p { margin-top: 1.5rem; }
+
 /* ---- 꼬리말 ---- */
 .foot {
   border-top: 1px solid var(--line);
@@ -801,6 +813,10 @@ html[data-intro="settle"] .hero-art .cell {
 
 /* ---- 움직임 ---- */
 @media (prefers-reduced-motion: no-preference) {
+  /* 사이트 안에서 페이지를 옮길 때 배너 로고는 제자리에 두고 나머지만 바꾼다 */
+  @view-transition { navigation: auto; }
+  .brand { view-transition-name: brand; }
+
   /* 화면에 들어오는 만큼 제자리로 올라온다. 스크롤 위치를 읽기만 하고 스크롤 속도는 바꾸지 않는다.
      투명도는 건드리지 않는다. 스크롤 없이 페이지를 그리는 도구에서도 내용이 보여야 한다. */
   @supports (animation-timeline: view()) {

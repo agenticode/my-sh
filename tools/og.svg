@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<style>
+  @font-face { font-family: "SUIT Variable"; src: url(../site/fonts/SUIT-Variable-2.040.woff2) format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Geist Mono"; src: url(../site/fonts/GeistMono-Variable-1.400.woff2) format("woff2"); font-weight: 100 900; }
+  text { font-family: "SUIT Variable", sans-serif; fill: #16181D; }
+  .wm { font-size: 176px; font-weight: 460; letter-spacing: -6px; }
+  .wm .a { font-weight: 900; fill: #E31937; }
+  .sl { font-size: 54px; font-weight: 760; letter-spacing: -1.6px; }
+  .sl .a { font-weight: 900; fill: #E31937; }
+  .ad { font-family: "Geist Mono", monospace; font-size: 26px; font-weight: 500; fill: #5A6070; }
+</style>
+<defs>
+  <pattern id="dots" x="760" y="135" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="1.9" fill="#C4C8D0"/></pattern>
+  <radialGradient id="fade" cx="0.5" cy="0.5" r="0.62"><stop offset="0.5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff"/></radialGradient>
+</defs>
+<rect width="1200" height="630" fill="#fff"/>
+<g>
+  <rect x="760" y="135" width="408" height="360" fill="url(#dots)"/>
+  <rect x="788.5" y="307.5" width="15" height="15" rx="3.5" fill="#F58025"/>
+  <rect x="836.5" y="307.5" width="15" height="15" rx="3.5" fill="#E31937"/>
+  <rect x="884.5" y="307.5" width="15" height="15" rx="3.5" fill="#F58025"/>
+  <rect x="932.5" y="307.5" width="15" height="15" rx="3.5" fill="#FBCFA9"/>
+  <rect x="956.5" y="307.5" width="15" height="15" rx="3.5" fill="#E31937"/>
+  <rect x="1028.5" y="307.5" width="15" height="15" rx="3.5" fill="#FBCFA9"/>
+  <rect x="1076.5" y="307.5" width="15" height="15" rx="3.5" fill="#F58025"/>
+  <rect x="1124.5" y="307.5" width="15" height="15" rx="3.5" fill="#E31937"/>
+  <rect x="836.5" y="331.5" width="15" height="15" rx="3.5" fill="#FBCFA9"/>
+  <rect x="1076.5" y="331.5" width="15" height="15" rx="3.5" fill="#FBCFA9"/>
+  <rect x="740" y="115" width="448" height="400" fill="url(#fade)"/>
+</g>
+<text class="wm" x="72" y="270"><tspan class="a">M</tspan>emor<tspan class="a" dx="-6">Y</tspan></text>
+<text class="sl" x="78" y="372">Memory의 <tspan class="a">M</tspan>부터 <tspan class="a">Y</tspan>까지</text>
+<text class="sl" x="78" y="440">모든 것을 책임지는 솔루션</text>
+<text class="ad" x="80" y="546">my.sh</text>
+<rect x="72" y="582" width="1056" height="4" fill="url(#bar)"/>
+<defs><linearGradient id="bar" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#E31937"/><stop offset="1" stop-color="#F58025"/></linearGradient></defs>
+</svg>

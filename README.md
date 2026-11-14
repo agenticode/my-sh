@@ -51,6 +51,14 @@ cwebp -q 82 -resize 1600 0 shot.png -o site/captures/slot-map.webp
 
 The slot name is the `data-capture` attribute in `site/index.html`. Until a file exists the browser logs one 404 per empty slot. The server caches images for one hour, so a replaced file can take that long to show.
 
+## Share image and icons
+
+```
+node tools/render.mjs
+```
+
+This renders `tools/og.svg` to `site/og.png` (1200 x 630) and `site/favicon.svg` to `site/apple-touch-icon.png` and `site/favicon.ico` with a local Chrome. Set `CHROME` to the browser binary if it is not in the default macOS location. Run it after editing either SVG and commit the output.
+
 ## Fonts
 
 SUIT Variable 2.040 and Geist Mono 1.400, both under the SIL Open Font License 1.1. The license texts are next to the files in `site/fonts/`.
