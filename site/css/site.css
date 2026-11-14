@@ -15,6 +15,11 @@
   font-display: swap;
 }
 
+/* 로고가 접히고 펴지는 정도. 숫자로 등록해 두어야 키프레임 사이를 보간한다. */
+@property --fold { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ext { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --wave { syntax: "<number>"; inherits: true; initial-value: -2; }
+
 :root {
   --ink: #16181D;
   --ink-2: #5A6070;
@@ -111,6 +116,149 @@ code, pre, .mono { font-family: var(--mono); }
 }
 .wm b { font-weight: 900; color: var(--red); }
 .wm b:last-child { margin-left: -0.045em; }
+
+/* ---- 움직이는 로고: MemorY 가 MY.sh 로 접혔다가 다시 펴진다 ----
+   --fold 0 은 MemorY, 1 은 MY. --ext 1 이면 .sh 가 붙는다.
+   글자 폭은 em 값으로 두고(스크립트가 실제 폭을 재서 덮는다) 접히는 만큼 줄인다. */
+.mark {
+  position: relative;
+  display: inline-block;
+  font-weight: 460;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  white-space: nowrap;
+  font-kerning: none;
+  contain: layout style;
+}
+.mark-size { visibility: hidden; }
+.mark-size b { font-weight: 900; }
+.mark-size b:last-child { margin-left: -0.045em; }
+.mark-size + .mark-live { position: absolute; left: 0; top: 0; }
+.mk-m, .mk-y {
+  display: inline-block;
+  font-weight: 900;
+  color: var(--red);
+}
+.mk-y { margin-left: calc(-0.045em * (1 - var(--fold))); }
+.mk-l {
+  /* 펼 때는 M 옆 글자부터, 접을 때는 Y 옆 글자부터 움직인다 */
+  --p: clamp(0, calc(var(--fold) * 1.45 - (3 - var(--i)) * 0.15), 1);
+  --h: clamp(0, calc(1 - max(var(--wave) - var(--i), var(--i) - var(--wave)) / 1.25), 1);
+  display: inline-block;
+  width: calc(var(--w) * (1 - var(--p)));
+  opacity: calc(1 - var(--p) * var(--p) * var(--p));
+  color: color-mix(in srgb, var(--red) calc(var(--h) * 100%), var(--ink));
+}
+.mk-l > span {
+  display: inline-block;
+  transform-origin: 0 50%;
+  transform: scaleX(calc(1 - var(--p)));
+}
+.mk-l:nth-child(even) > span {
+  transform-origin: 100% 50%;
+  margin-left: calc(var(--w) * var(--p) * -1);
+}
+@supports (transform: rotateY(acos(0.5))) {
+  /* 병풍처럼 접는다. 접힌 각도의 코사인이 남은 폭이다. */
+  .mk-l > span { transform: perspective(2.6em) rotateY(acos(calc(1 - var(--p)))); }
+  .mk-l:nth-child(even) > span { transform: perspective(2.6em) rotateY(calc(acos(calc(1 - var(--p))) * -1)); }
+}
+.mk-l:nth-child(1) { --i: 0; --w: var(--w0, 0.555em); }
+.mk-l:nth-child(2) { --i: 1; --w: var(--w1, 0.868em); }
+.mk-l:nth-child(3) { --i: 2; --w: var(--w2, 0.585em); }
+.mk-l:nth-child(4) { --i: 3; --w: var(--w3, 0.36em); }
+.mk-ext {
+  display: inline-block;
+  width: calc(var(--wx, 1.27em) * var(--ext));
+}
+.mk-x {
+  --q: clamp(0, calc((var(--ext) - var(--j) * 0.2) / 0.6), 1);
+  display: inline-block;
+  opacity: var(--q);
+  transform: translateX(calc((1 - var(--q)) * 0.45em));
+}
+.mk-x:nth-child(1) { --j: 0; }
+.mk-x:nth-child(2) { --j: 1; }
+.mk-x:nth-child(3) { --j: 2; }
+
+.mark-live {
+  animation:
+    mk-fold 7.2s infinite both,
+    mk-ext 7.2s infinite both,
+    mk-wave 7.2s infinite both;
+  animation-delay: var(--mk-delay, 0s);
+}
+.brand:hover .mark-live,
+.brand:focus-visible .mark-live { animation-play-state: paused; }
+
+@keyframes mk-fold {
+  0%, 36% { --fold: 0; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  47% { --fold: 1; }
+  89% { --fold: 1; animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  100% { --fold: 0; }
+}
+@keyframes mk-ext {
+  0%, 46% { --ext: 0; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  54% { --ext: 1; }
+  83% { --ext: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.3); }
+  89%, 100% { --ext: 0; }
+}
+/* 펴진 동안 빨간 기운이 M 에서 Y 쪽으로 한 번 지나간다 */
+@keyframes mk-wave {
+  0%, 5% { --wave: -1.3; animation-timing-function: linear; }
+  27%, 100% { --wave: 4.3; }
+}
+
+/* ---- 첫 화면 인트로 ----
+   data-intro 는 js/site.js 가 문서 머리에서 정한다.
+   play: 큰 로고가 화면을 덮는다. reveal: 로고가 배너로 가는 동안 본문이 드러난다.
+   settle: 덮개는 사라지고 본문 등장만 마저 끝난다. done: 끝 상태. */
+.intro { display: none; }
+html[data-intro="play"] .intro,
+html[data-intro="reveal"] .intro {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+.intro-bg { position: absolute; inset: 0; background: #fff; }
+.intro-x, .intro-y { width: max-content; will-change: transform; }
+.intro-y { transform-origin: 0 0; }
+.mark-intro {
+  font-size: clamp(4.25rem, 20.5vw, 20rem);
+  opacity: 0;
+}
+.mark-intro .mark-live { animation: none; }
+
+html[data-intro="play"] .banner .mark-live,
+html[data-intro="reveal"] .banner .mark-live {
+  animation: none;
+  --fold: 1;
+  --ext: 1;
+  visibility: hidden;
+}
+html[data-intro="play"] [data-enter] { opacity: 0; }
+html[data-intro="reveal"] [data-enter],
+html[data-intro="settle"] [data-enter] {
+  animation: enter 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--e, 0) * 60ms + 100ms);
+}
+html[data-intro="play"] .hero-art .cell { opacity: 0; }
+html[data-intro="reveal"] .hero-art .cell,
+html[data-intro="settle"] .hero-art .cell {
+  animation: cell-in 0.5s var(--ease-out) both;
+  animation-delay: calc(var(--k, 0) * 45ms + 320ms);
+}
+@keyframes enter {
+  from { opacity: 0; transform: translateY(0.875rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cell-in {
+  from { opacity: 0; transform: scale(0.2); }
+  to { opacity: 1; transform: none; }
+}
 
 /* ---- 배너 ---- */
 .banner {
@@ -617,6 +765,8 @@ code, pre, .mono { font-family: var(--mono); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* 로고는 인트로의 끝 상태인 MY.sh 로 멈춰 있다 */
+  .mark-live { animation: none; --fold: 1; --ext: 1; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
