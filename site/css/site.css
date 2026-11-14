@@ -15,6 +15,10 @@
   font-display: swap;
 }
 
+/* 인트로 로고가 접히고 .sh 가 붙는 정도. 숫자로 등록해 두어야 중간값을 보간한다. */
+@property --fold { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ext { syntax: "<number>"; inherits: true; initial-value: 0; }
+
 :root {
   --ink: #16181D;
   --ink-2: #5A6070;
@@ -111,6 +115,202 @@ code, pre, .mono { font-family: var(--mono); }
 }
 .wm b { font-weight: 900; color: var(--red); }
 .wm b:last-child { margin-left: -0.045em; }
+
+/* ---- 움직이는 로고: MemorY 가 MY.sh 로 접혔다가 다시 펴진다 ---- */
+.mark {
+  position: relative;
+  display: inline-block;
+  font-weight: 460;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  white-space: nowrap;
+  font-kerning: none;
+}
+.mark-size { visibility: hidden; }
+.mark-size b { font-weight: 900; }
+.mark-size b:last-child { margin-left: -0.045em; }
+.mark-size + .mark-live { position: absolute; left: 0; top: 0; }
+.mk-m, .mk-y, .mk-l, .mk-x, .mk-ext { display: inline-block; }
+.mk-m, .mk-y { font-weight: 900; color: var(--red); }
+.mk-l:nth-child(1) { --i: 0; }
+.mk-l:nth-child(2) { --i: 1; }
+.mk-l:nth-child(3) { --i: 2; }
+.mk-l:nth-child(4) { --i: 3; }
+.mk-x:nth-child(1) { --j: 0; }
+.mk-x:nth-child(2) { --j: 1; }
+.mk-x:nth-child(3) { --j: 2; }
+
+/* 배너 반복. transform 과 opacity 만 움직여서 레이아웃을 다시 잡지 않는다.
+   가운데 글자 묶음(.mk-mid)이 M 쪽으로 눌리고, 그 폭만큼 Y 와 .sh 가 따라온다.
+   .mk-slide 는 묶음과 폭이 같아서 -100% 만 옮기면 글자 폭을 잴 필요가 없다. */
+.mark-loop .mk-track { display: inline-block; position: relative; }
+.mark-loop .mk-mid {
+  display: inline-block;
+  transform-origin: 0 50%;
+  animation: lp-mid 7.2s infinite both, lp-mid-fade 7.2s infinite both;
+  animation-delay: var(--mk-delay, 0s);
+}
+.mark-loop .mk-l { position: relative; }
+.mark-loop .mk-l::after {
+  /* 같은 글자를 빨갛게 겹쳐 두고 차례로 켠다. 빨간 기운이 M 에서 Y 쪽으로 지나간다. */
+  content: attr(data-c);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--red);
+  opacity: 0;
+  animation: lp-glow 7.2s infinite both;
+  animation-delay: calc(var(--mk-delay, 0s) + var(--i) * 0.22s);
+}
+.mark-loop .mk-slide {
+  position: absolute;
+  inset: 0;
+  animation: lp-slide 7.2s infinite both;
+  animation-delay: var(--mk-delay, 0s);
+}
+.mark-loop .mk-tail {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  animation: lp-tail 7.2s infinite both;
+  animation-delay: var(--mk-delay, 0s);
+}
+.mark-loop .mk-ext { margin-left: -0.06em; }
+.mark-loop .mk-x {
+  animation: lp-x 7.2s infinite both;
+  animation-delay: calc(var(--mk-delay, 0s) + var(--j) * 70ms);
+}
+.brand:hover .mark-live *,
+.brand:hover .mark-live *::after,
+.brand:focus-visible .mark-live *,
+.brand:focus-visible .mark-live *::after { animation-play-state: paused; }
+
+/* 한 바퀴 7.2 초: MemorY 2.6 초, 접기 0.8 초, .sh 0.5 초, MY.sh 2.1 초, .sh 빼기 0.4 초, 펴기 0.8 초 */
+@keyframes lp-mid {
+  0%, 36% { transform: scaleX(1); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  47%, 89% { transform: scaleX(0); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  100% { transform: scaleX(1); }
+}
+@keyframes lp-mid-fade {
+  0%, 41% { opacity: 1; }
+  47%, 89% { opacity: 0; }
+  95%, 100% { opacity: 1; }
+}
+@keyframes lp-slide {
+  0%, 36% { transform: translateX(0); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  47%, 89% { transform: translateX(-100%); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  100% { transform: translateX(0); }
+}
+/* 펴져 있을 때만 Y 를 r 쪽으로 조금 당긴다 */
+@keyframes lp-tail {
+  0%, 36% { transform: translateX(-0.045em); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  47%, 89% { transform: translateX(0); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  100% { transform: translateX(-0.045em); }
+}
+@keyframes lp-x {
+  0%, 46% { opacity: 0; transform: translateX(0.45em); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  53%, 83% { opacity: 1; transform: translateX(0); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.3); }
+  88%, 100% { opacity: 0; transform: translateX(0.45em); }
+}
+@keyframes lp-glow {
+  0%, 4% { opacity: 0; }
+  7.5% { opacity: 1; }
+  12.5%, 100% { opacity: 0; }
+}
+
+/* 멈춘 MY.sh. 인트로가 도는 동안과 움직임을 줄인 환경에서 배너 로고가 이 상태다. */
+html[data-intro="play"] .mark-loop .mk-mid,
+html[data-intro="reveal"] .mark-loop .mk-mid { animation: none; transform: scaleX(0); opacity: 0; }
+html[data-intro="play"] .mark-loop .mk-slide,
+html[data-intro="reveal"] .mark-loop .mk-slide { animation: none; transform: translateX(-100%); }
+html[data-intro="play"] .mark-loop .mk-tail,
+html[data-intro="reveal"] .mark-loop .mk-tail,
+html[data-intro="play"] .mark-loop .mk-x,
+html[data-intro="reveal"] .mark-loop .mk-x { animation: none; }
+html[data-intro="play"] .mark-loop .mk-l::after,
+html[data-intro="reveal"] .mark-loop .mk-l::after { animation: none; }
+html[data-intro="play"] .mark-loop .mark-live,
+html[data-intro="reveal"] .mark-loop .mark-live { visibility: hidden; }
+
+/* 인트로의 큰 로고. --fold 0 은 MemorY, 1 은 MY. --ext 1 이면 .sh 가 붙는다.
+   가운데 글자를 병풍처럼 접고, 접힌 만큼 폭을 줄여 M 과 Y 가 가운데로 모이게 한다.
+   글자 폭은 em 값으로 두고 스크립트가 실제 폭을 재서 덮는다. */
+.mark-intro .mk-y { margin-left: calc(-0.045em * (1 - var(--fold))); }
+.mark-intro .mk-l {
+  /* 접을 때는 Y 옆 글자부터 움직인다 */
+  --p: clamp(0, calc(var(--fold) * 1.45 - (3 - var(--i)) * 0.15), 1);
+  width: calc(var(--w) * (1 - var(--p)));
+  opacity: calc(1 - var(--p) * var(--p) * var(--p));
+}
+.mark-intro .mk-l > span {
+  display: inline-block;
+  transform-origin: 0 50%;
+  transform: scaleX(calc(1 - var(--p)));
+}
+.mark-intro .mk-l:nth-child(even) > span {
+  transform-origin: 100% 50%;
+  margin-left: calc(var(--w) * var(--p) * -1);
+}
+@supports (transform: rotateY(acos(0.5))) {
+  /* 접힌 각도의 코사인이 남은 폭이다 */
+  .mark-intro .mk-l > span { transform: perspective(2.6em) rotateY(acos(calc(1 - var(--p)))); }
+  .mark-intro .mk-l:nth-child(even) > span { transform: perspective(2.6em) rotateY(calc(acos(calc(1 - var(--p))) * -1)); }
+}
+.mark-intro .mk-l:nth-child(1) { --w: var(--w0, 0.555em); }
+.mark-intro .mk-l:nth-child(2) { --w: var(--w1, 0.868em); }
+.mark-intro .mk-l:nth-child(3) { --w: var(--w2, 0.585em); }
+.mark-intro .mk-l:nth-child(4) { --w: var(--w3, 0.36em); }
+.mark-intro .mk-ext {
+  width: calc(var(--wx, 1.27em) * var(--ext));
+  margin-left: calc(-0.06em * var(--ext));
+}
+.mark-intro .mk-x {
+  --q: clamp(0, calc((var(--ext) - var(--j) * 0.2) / 0.6), 1);
+  opacity: var(--q);
+  transform: translateX(calc((1 - var(--q)) * 0.45em));
+}
+
+/* ---- 첫 화면 인트로 ----
+   data-intro 는 js/site.js 가 문서 머리에서 정한다.
+   play: 큰 로고가 화면을 덮는다. reveal: 로고가 배너로 가는 동안 본문이 드러난다.
+   settle: 덮개는 사라지고 본문 등장만 마저 끝난다. done: 끝 상태. */
+.intro { display: none; }
+html[data-intro="play"] .intro,
+html[data-intro="reveal"] .intro {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+}
+.intro-bg { position: absolute; inset: 0; background: #fff; }
+.intro-x, .intro-y { width: max-content; will-change: transform; }
+.intro-y { transform-origin: 0 0; }
+.mark-intro {
+  font-size: clamp(4.25rem, 20.5vw, 20rem);
+  opacity: 0;
+}
+html[data-intro="play"] [data-enter] { opacity: 0; }
+html[data-intro="reveal"] [data-enter],
+html[data-intro="settle"] [data-enter] {
+  animation: enter 0.5s var(--ease-out) both;
+  animation-delay: calc(var(--e, 0) * 50ms + 300ms);
+}
+html[data-intro="play"] .hero-art .cell { opacity: 0; }
+html[data-intro="reveal"] .hero-art .cell,
+html[data-intro="settle"] .hero-art .cell {
+  animation: cell-in 0.5s var(--ease-out) both;
+  animation-delay: calc(var(--k, 0) * 45ms + 320ms);
+}
+@keyframes enter {
+  from { opacity: 0; transform: translateY(0.875rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cell-in {
+  from { opacity: 0; transform: scale(0.2); }
+  to { opacity: 1; transform: none; }
+}
 
 /* ---- 배너 ---- */
 .banner {
@@ -617,6 +817,10 @@ code, pre, .mono { font-family: var(--mono); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* 로고는 인트로의 끝 상태인 MY.sh 로 멈춰 있다 */
+  .mark-loop .mk-mid { animation: none; transform: scaleX(0); opacity: 0; }
+  .mark-loop .mk-slide { animation: none; transform: translateX(-100%); }
+  .mark-loop .mk-tail, .mark-loop .mk-x, .mark-loop .mk-l::after { animation: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

@@ -8,12 +8,17 @@
 <meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://my.sh/">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/ko-wrap.css">
-<link rel="stylesheet" href="/css/site.css">
-<script src="/js/site.js" defer></script>
+<link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
+<link rel="stylesheet" href="/css/site.css?v=adeca5e4">
+<script src="/js/site.js?v=98a44495"></script>
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<div class="intro" aria-hidden="true">
+  <div class="intro-bg"></div>
+  <div class="intro-x"><div class="intro-y"><span class="mark mark-intro"><span class="mark-live" aria-hidden="true"><span class="mk-m">M</span><span class="mk-mid"><span class="mk-l"><span>e</span></span><span class="mk-l"><span>m</span></span><span class="mk-l"><span>o</span></span><span class="mk-l"><span>r</span></span></span><span class="mk-y">Y</span><span class="mk-ext"><span class="mk-x">.</span><span class="mk-x">s</span><span class="mk-x">h</span></span></span></span></div></div>
+</div>
 
 <svg class="defs" aria-hidden="true" focusable="false">
   <defs>
@@ -28,7 +33,7 @@
 <header class="banner">
   <div class="wrap banner-in">
     <a class="brand" href="/" aria-label="MemorY 첫 화면">
-      <span class="wm" aria-hidden="true"><b>M</b>emor<b>Y</b></span>
+      <span class="mark mark-loop"><span class="mark-size" aria-hidden="true"><b>M</b>emor<b>Y</b></span><span class="mark-live" aria-hidden="true"><span class="mk-m">M</span><span class="mk-track"><span class="mk-mid"><span class="mk-l" data-c="e">e</span><span class="mk-l" data-c="m">m</span><span class="mk-l" data-c="o">o</span><span class="mk-l" data-c="r">r</span></span><span class="mk-slide"><span class="mk-tail"><span class="mk-y">Y</span><span class="mk-ext"><span class="mk-x">.</span><span class="mk-x">s</span><span class="mk-x">h</span></span></span></span></span></span></span>
     </a>
     <nav class="nav" aria-label="주요 메뉴">
       <a href="#what">소개</a>
@@ -44,10 +49,10 @@
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero-in">
     <div class="hero-copy">
-      <h1 class="hero-title" id="hero-title"><span class="wm"><b>M</b>emor<b>Y</b></span></h1>
-      <p class="slogan"><span>Memory의 <b>M</b>부터 <b>Y</b>까지</span><span>모든 것을 책임지는 솔루션</span></p>
-      <p class="lede">서버의 메모리 오류 기록을 읽어, DIMM 어디에 어떤 모양의 고장이 있는지 그림으로 보여주는 읽기 전용 오픈소스 도구입니다.</p>
-      <div class="hero-actions">
+      <h1 class="hero-title" id="hero-title" data-enter style="--e:0"><span class="wm"><b>M</b>emor<b>Y</b></span></h1>
+      <p class="slogan" data-enter style="--e:1"><span>Memory의 <b>M</b>부터 <b>Y</b>까지</span><span>모든 것을 책임지는 솔루션</span></p>
+      <p class="lede" data-enter style="--e:2">서버의 메모리 오류 기록을 읽어, DIMM 어디에 어떤 모양의 고장이 있는지 그림으로 보여주는 읽기 전용 오픈소스 도구입니다.</p>
+      <div class="hero-actions" data-enter style="--e:3">
         <a class="btn" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub <span class="mono">agenticode/my</span></a>
         <a class="link" href="#start">빠른 시작</a>
         <span class="chip">개발 중</span>
