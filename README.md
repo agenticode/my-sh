@@ -16,6 +16,20 @@ Then open <http://127.0.0.1:8599/>.
 
 The production server sends `script-src 'self'`, so scripts go in files under `site/js/`. Inline `<script>` blocks do not run.
 
+## After editing CSS or JS
+
+```
+node tools/stamp.mjs
+```
+
+The server lets browsers cache `site/css/` and `site/js/` for one hour. The script rewrites the `?v=` value on the link and script tags in `site/*.html` from each file's content, so an edited file is fetched again right away. `node tools/stamp.mjs --check` exits with 1 when a value is out of date.
+
+## Logo motion
+
+On the first visit in a tab the page opens with MemorY in the center, folds it to MY.sh and moves it into the banner in about 3.2 s. Any scroll, click or key press ends it at once. It runs once per tab session (`sessionStorage` key `my.intro`), and it is skipped for links with a `#hash` and under `prefers-reduced-motion: reduce`.
+
+The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `transform` and `opacity`, pauses on hover and stands still as MY.sh under reduced motion. Timings are in `site/css/site.css` (`lp-*` keyframes) and at the top of the intro code in `site/js/site.js`.
+
 ## Captures
 
 Each figure on the page has a framed slot that shows a gray skeleton until a screenshot exists. To fill a slot, save the screenshot under the name in the table and commit it. No HTML change is needed.
