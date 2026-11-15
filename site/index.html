@@ -54,6 +54,7 @@
     <nav class="nav" aria-label="주요 메뉴">
       <a href="#what">소개</a>
       <a href="#figures">그림</a>
+      <a href="#lab">검증</a>
       <a href="#start">빠른 시작</a>
       <a class="nav-gh" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub</a>
     </nav>
@@ -106,6 +107,12 @@
         <code>kernel log</code>
         <code>EDAC sysfs</code>
         <code>SMBIOS</code>
+        <code>BMC SEL</code>
+        <code>Redfish</code>
+        <code>nvidia-smi</code>
+        <code>CXL</code>
+        <code>mcelog</code>
+        <code>FMFM JSON</code>
       </div>
     </div>
   </div>
@@ -133,7 +140,7 @@
       <p class="sec-tag">그림</p>
       <div class="sec-body">
         <h2 id="figures-h">그림으로 보여줍니다</h2>
-        <p class="sec-lead">그림마다 답하는 질문이 하나씩 있습니다. 화면은 아직 개발 중이라, 아래 칸은 실제 캡처가 나오면 채웁니다.</p>
+        <p class="sec-lead">그림마다 답하는 질문이 하나씩 있습니다. 아래 화면은 랩의 aarch64 게스트에 펌웨어 오류 레코드로 CE&nbsp;24건, UE&nbsp;2건을 넣고 MemorY로 읽은 결과입니다. 타임라인은 같은 게스트의 다음 부팅까지 한 케이스로 묶었습니다.</p>
       </div>
     </div>
 
@@ -237,6 +244,33 @@
   </div>
 </section>
 
+<section class="sec" id="lab" aria-labelledby="lab-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">검증</p>
+    <div class="sec-body">
+      <h2 id="lab-h">실제 커널이 남긴 기록으로 시험합니다</h2>
+      <p>랩 서버의 Fedora VM(커널 7.3.0)과 그 안의 QEMU 게스트에 위치를 아는 메모리 오류를 넣고, 커널과 rasdaemon이 남긴 기록을 그대로 떠 왔습니다. 캡처는 11개입니다. x86_64 게스트의 머신 체크, CXL 메모리 장치의 오류, 페이지 offline, aarch64 게스트의 펌웨어 오류 레코드를 담았고, 커널은 7.3.0과 6.19.10, rasdaemon은 0.8.0과 1.0.0입니다.</p>
+      <p>캡처는 저장소의 <code>testdata/real/</code>에 있습니다. 테스트가 매번 넣은 오류와 MemorY가 센 오류를 대조하고, <code>my verify</code>로 직접 대조할 수도 있습니다.</p>
+      <p>캡처를 읽으면서 찾은 결함을 PR 11건으로 고쳤습니다. 두 가지 예입니다.</p>
+      <ol class="gaps">
+        <li><span>dmidecode 3.7은 용량을 <code>16 GiB</code>로 적습니다. 이 표기를 읽지 못해 꽂힌 DIMM을 하나도 찾지 못했습니다.</span></li>
+        <li><span>rasdaemon이 뜬 뒤 시계가 10초 뒤로 돌아간 부팅에서, rasdaemon의 시각이 커널 시각보다 10초 앞섰습니다. 같은 오류를 두 번 세어, 넣은 CE&nbsp;10건과 UE&nbsp;1건을 CE&nbsp;18건과 UE&nbsp;2건으로 표시했습니다. 지금은 같은 부팅의 커널 로그 시각에 맞춰 한 번만 셉니다.</span></li>
+      </ol>
+      <p>랩 VM 자체에서도 돌렸습니다. VMware 가상 보드라 메모리 컨트롤러의 EDAC 드라이버가 없고, MemorY는 없는 소스를 빼고 읽은 소스만으로 그립니다.</p>
+      <pre class="term"><code><span class="ps">$ </span>my scan --width 52
+ 슬롯 128개, DIMM 3개
+
+ 오류 기록이 있는 DIMM 없음
+
+ 오류 없는 DIMM 3개
+ 이 호스트의 page offline 80건은 어느 DIMM에도 묶이지 않음
+ 소스  hostinfo 2건, rasdaemon 6건, klog (저널) 160건, klog
+       (링 버퍼) 7건, edac-sysfs 기록 없음, smbios 128건</code></pre>
+      <p>랩에는 실제 메모리 컨트롤러, EINJ, BMC, GPU가 없습니다. 실서버 기록으로 하는 검증과 공개 현장 데이터 평가가 다음 단계입니다.</p>
+    </div>
+  </div>
+</section>
+
 <section class="sec start" id="start" aria-labelledby="start-h">
   <div class="wrap sec-grid">
     <p class="sec-tag">시작</p>
@@ -248,7 +282,13 @@
       <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
 <span class="ps">$ </span>cd my
 <span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
-      <p>그림을 그리는 화면과 리포트는 아직 병합 전입니다. 진행 상황은 <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a>에 있습니다.</p>
+      <p>자주 쓰는 명령입니다.</p>
+      <pre class="term"><code><span class="ps">$ </span>my                          <span class="cm"># 이 호스트의 슬롯 맵과 DIMM 순위</span>
+<span class="ps">$ </span>my why "DIMM 0"             <span class="cm"># 판정과 근거</span>
+<span class="ps">$ </span>my bundle -o case.mycase    <span class="cm"># 기록을 케이스 파일 하나로</span>
+<span class="ps">$ </span>my open case.mycase         <span class="cm"># 받은 케이스를 같은 화면으로</span>
+<span class="ps">$ </span>my report case.mycase -o report.html</code></pre>
+      <p>그림 화면, HTML 리포트, 케이스 번들, Prometheus exporter, <code>my diff</code>, <code>my verify</code>, 분석기 플러그인 계약은 main에 들어갔습니다. BMC에 Redfish로 직접 묻는 수집과 공개 현장 데이터 평가는 작업 중입니다. 진행 상황은 <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a>에 있습니다.</p>
     </div>
   </div>
 </section>
