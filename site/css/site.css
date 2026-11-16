@@ -50,8 +50,6 @@
   --line: #E7E9ED;
   --line-2: #D3D6DC;
   --wash: #F6F7F9;
-  --skel: #ECEEF1;
-  --skel-2: #DFE2E7;
   --red: #E31937;
   --orange: #F58025;
 
@@ -128,7 +126,7 @@ code, pre, .mono { font-family: var(--mono); }
 
 /* 버튼, 메뉴, 꼬리표처럼 짧은 대표 글은 줄 길이를 고르게 한다 */
 .skip, .btn, .link, .nav a, .chip, .sec-tag, .inputs-key,
-.capture-wait, .shape-name, .fig-q, .partners a {
+.shape-name, .fig-q, .partners a {
   text-wrap-style: balance;
 }
 
@@ -322,18 +320,8 @@ html[data-intro="settle"] [data-enter] {
   animation: enter 0.5s var(--ease-out) both;
   animation-delay: calc(var(--e, 0) * 50ms + 300ms);
 }
-html[data-intro="play"] .hero-art .cell { opacity: 0; }
-html[data-intro="reveal"] .hero-art .cell,
-html[data-intro="settle"] .hero-art .cell {
-  animation: cell-in 0.5s var(--ease-out) both;
-  animation-delay: calc(var(--k, 0) * 45ms + 320ms);
-}
 @keyframes enter {
   from { opacity: 0; transform: translateY(0.875rem); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes cell-in {
-  from { opacity: 0; transform: scale(0.2); }
   to { opacity: 1; transform: none; }
 }
 
@@ -519,21 +507,39 @@ html[data-intro="settle"] .hero-art .cell {
   background: var(--orange);
 }
 
-/* 히어로 그림: 점 격자 위에 가로줄 하나. 뜻을 전하는 글이 없는 장식이다. */
+/* 설치 한 줄: GitHub 버튼 바로 아래 */
+.hero-copy .hero-install {
+  margin-top: 1.25rem;
+  width: fit-content;
+  max-width: 100%;
+  padding-inline: clamp(0.875rem, 3vw, 1.25rem) clamp(1.25rem, 5vw, 2.5rem);
+  font-size: clamp(0.875rem, 3.6vw, 1rem);
+  font-weight: 520;
+}
+
+/* 히어로 화면: 랩 캡처를 읽은 실제 출력. 칸 폭(--cols)이 그림 칸에 꼭 맞도록 글자 크기를 정한다.
+   Geist Mono 한 칸은 0.6em 이다. */
 .hero-art {
   min-width: 0;
   justify-self: end;
-  width: min(100%, 35rem);
-  -webkit-mask-image: radial-gradient(115% 95% at 55% 50%, #000 38%, transparent 76%);
-  mask-image: radial-gradient(115% 95% at 55% 50%, #000 38%, transparent 76%);
+  width: min(100%, 34rem);
+  container-type: inline-size;
 }
-.hero-art svg { width: 100%; height: auto; }
-.dot { fill: #C4C8D0; }
-.sk-dot { fill: var(--skel-2); }
-.cell { transform-box: fill-box; transform-origin: 50% 50%; }
-.c1 { fill: #FBCFA9; }
-.c2 { fill: var(--orange); }
-.c3 { fill: var(--red); }
+.hero-art .term-hero {
+  --pad: clamp(0.875rem, 3cqi, 1.375rem);
+  width: 100%;
+  margin-top: 0;
+  font-size: min(0.875rem, calc((100cqi - 2 * var(--pad) - 0.25rem) / (var(--cols, 52) * 0.6)));
+  line-height: 1.5;
+  max-height: none;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.hero-note {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+}
 
 /* ---- 구역 ---- */
 .sec {
@@ -658,15 +664,6 @@ html[data-intro="settle"] .hero-art .cell {
   background: #FBFBFC;
   overflow: hidden;
 }
-.capture-skel {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.capture-skel .s1 { fill: var(--skel); }
-.capture-skel .s2 { fill: var(--skel-2); }
-.capture-skel .o1 { fill: #fff; stroke: var(--skel-2); stroke-width: 0.6; }
 .capture-frame img {
   position: absolute;
   inset: 0;
@@ -674,26 +671,7 @@ html[data-intro="settle"] .hero-art .cell {
   height: 100%;
   object-fit: contain;
   background: #fff;
-  opacity: 0;
-  transition: opacity 0.4s;
 }
-.capture-wait {
-  position: absolute;
-  left: 0.875rem;
-  bottom: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.9);
-  border: 1px solid var(--line);
-  font-size: 0.75rem;
-  font-weight: 520;
-  line-height: 1.5;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.capture.is-ready img { opacity: 1; }
-.capture.is-ready .capture-wait,
-.capture.is-ready .capture-skel { display: none; }
 .capture.is-missing img { display: none; }
 
 .capture figcaption { min-width: 0; }
@@ -724,20 +702,19 @@ html[data-intro="settle"] .hero-art .cell {
   text-wrap-style: balance;
 }
 
-/* 고장 모드와 모양 네 가지 */
+/* 고장 모드와 모양 네 가지: my map 출력에서 격자만 잘라 낸 그림 */
 .shapes {
   margin-top: 1rem;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 0.75rem;
 }
 .shapes li { min-width: 0; }
-.shapes svg {
+.shapes img {
   width: 100%;
   height: auto;
-  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--ink);
 }
 .shape-name {
   display: block;
@@ -959,7 +936,6 @@ html[data-intro="settle"] .hero-art .cell {
 @media (max-width: 60rem) {
   .hero-in { grid-template-columns: minmax(0, 1fr); align-items: start; gap: 1.5rem; min-height: 0; }
   .hero-art { justify-self: stretch; width: 100%; }
-  .hero-art svg { height: clamp(9rem, 34vw, 15rem); }
   .sec-grid { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
   .sec-tag { padding-top: 0; }
   .partners { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -980,14 +956,14 @@ html[data-intro="settle"] .hero-art .cell {
     border-top: 1px solid var(--line);
   }
   .figs { grid-template-columns: minmax(0, 1fr); }
-  .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.75rem; }
   .caps > div { grid-template-columns: minmax(0, 1fr); }
-}
-@container (min-width: 44rem) {
-  .shapes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 26rem) {
   .btn { width: 100%; justify-content: center; }
+  /* 폰에서는 히어로 화면이 화면 폭을 거의 다 쓴다: 글자가 그만큼 커진다 */
+  .hero-art { width: auto; margin-inline: calc(0.5rem - var(--gutter)); }
+  .hero-art .term-hero { --pad: 0.625rem; border-radius: 10px; }
+  .hero-note { padding-inline: calc(var(--gutter) - 0.5rem); }
 }
 
 /* ---- 움직임 ---- */
