@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Download | MemorY</title>
-<meta name="description" content="The first release of MemorY is being prepared. Until then, build it from source with Go 1.26 or later, git and make.">
+<meta name="description" content="Get MemorY: archives for Linux (x86-64, ARM64) and macOS (Apple silicon) with their SHA-256 checksums, a one-line install script, and how to build from source.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/en/download/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="ko_KR">
 <meta property="og:url" content="https://my.sh/en/download/">
 <meta property="og:title" content="Download | MemorY">
-<meta property="og:description" content="The first release of MemorY is being prepared. Until then, build it from source with Go 1.26 or later, git and make.">
+<meta property="og:description" content="Get MemorY: archives for Linux (x86-64, ARM64) and macOS (Apple silicon) with their SHA-256 checksums, a one-line install script, and how to build from source.">
 <meta property="og:image" content="https://my.sh/og-en.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
+<link rel="stylesheet" href="/css/site.css?v=b66768ae">
+<script src="/js/download.js?v=1c4b9257" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -58,19 +59,116 @@
   </div>
 </header>
 
-<main id="main">
+<main id="main" data-release>
 
 <section class="sec page-top" aria-labelledby="dl-h">
   <div class="wrap sec-grid">
     <p class="sec-tag">Download</p>
     <div class="sec-body">
-      <h1 id="dl-h">The first release is being prepared</h1>
-      <p class="lines"><span>Until then, build MemorY from source.</span><span>You need Go&nbsp;1.26 or later, git and make.</span></p>
-      <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
+      <h1 id="dl-h">MemorY <span class="nowrap" data-r="version"></span></h1>
+      <dl class="spec rel-ready">
+        <div><dt>Published</dt><dd><time data-r="date"></time></dd></div>
+        <div><dt>Release notes</dt><dd><a class="link" data-r="notes" href="https://github.com/agenticode/my/releases/latest">GitHub</a></dd></div>
+        <div><dt>Commit</dt><dd><code data-r="commit"></code></dd></div>
+      </dl>
+      <noscript><p class="lines"><span>This page fills in the release from <a class="link" href="/release.json">release.json</a>.</span><span>The files are on <a class="link" href="https://github.com/agenticode/my/releases/latest">GitHub Releases</a>.</span></p></noscript>
+      <p class="lines rel-failed" role="alert"><span>The release information (<a class="link" href="/release.json">release.json</a>) could not be read.</span><span>The files are on <a class="link" href="https://github.com/agenticode/my/releases/latest">GitHub Releases</a>.</span></p>
+      <p class="lines"><span>Install it from a Linux or macOS terminal with one line.</span></p>
+      <pre class="term term-cmd term-big" tabindex="0" role="region" aria-label="Install command"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
+      <p class="lines"><span>What the script does, and its text: <a class="link" href="#install">Install script</a></span><span>Size and SHA-256 of each file: <a class="link" href="#files">Release files</a></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="install" aria-labelledby="install-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">Install</p>
+    <div class="sec-body">
+      <h2 id="install-h">Install script</h2>
+      <p class="lines"><span>It downloads the archive for this machine and SHA256SUMS from the GitHub release over HTTPS.</span><span>It installs only when the SHA-256 of the archive matches both SHA256SUMS and release.json.</span><span>On any difference it stops and installs nothing.</span></p>
+      <p class="lines"><span>It puts <code>my</code> in <code>~/.local/bin</code>.</span><span>It does not use sudo and does not edit shell startup files.</span><span>When that directory is not in PATH, it prints the line to add.</span><span>Last, it runs <code>my version</code>.</span></p>
+      <dl class="spec">
+        <div><dt><code>MY_INSTALL_DIR</code></dt><dd>the directory to install into</dd></div>
+        <div><dt><code>MY_VERSION</code></dt><dd>the version to install, checked against the SHA256SUMS on GitHub only</dd></div>
+      </dl>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Install command for one version"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | MY_VERSION=<span data-r="version">&lt;version&gt;</span> sh</code></pre>
+      <p class="lines"><span>To read it before running it, save it to a file.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Commands to save, read and run the script"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get -o get.sh
+<span class="ps">$ </span>less get.sh
+<span class="ps">$ </span>sh get.sh</code></pre>
+      <p class="lines"><span>This is the script <a class="link" href="/get">my.sh/get</a> serves now.</span></p>
+      <pre class="term term-out script" tabindex="0" role="region" aria-label="Install script get.sh" hidden><code data-r="script"></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="files" aria-labelledby="files-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">Files</p>
+    <div class="sec-body">
+      <h2 id="files-h">Release files</h2>
+      <p class="lines"><span>Each archive holds the <code>my</code> binary, LICENSE and README.md.</span><span>The binary is statically linked and needs no other library.</span></p>
+      <ul class="files rel-ready">
+        <li data-platform="linux/amd64">
+          <h3>Linux x86-64</h3>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>Size</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+        <li data-platform="linux/arm64">
+          <h3>Linux ARM64</h3>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>Size</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+        <li data-platform="darwin/arm64">
+          <h3>macOS on Apple silicon</h3>
+          <p class="note">For opening case bundles and writing reports on a workstation.</p>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>Size</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+      </ul>
+      <p class="lines rel-ready"><span>Checksums: <a class="link" data-r="sums" href="https://github.com/agenticode/my/releases/latest">SHA256SUMS</a></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="verify" aria-labelledby="verify-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">Check</p>
+    <div class="sec-body">
+      <h2 id="verify-h">Check a download</h2>
+      <p class="lines"><span>Download the archive and SHA256SUMS into one directory.</span><span><code>sha256sum -c</code> compares each file with its line in the list.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Commands to download and check"><code><span class="ps">$ </span>curl -fLO https://github.com/agenticode/my/releases/download/<span data-r="version">&lt;version&gt;</span>/my_<span data-r="version">&lt;version&gt;</span>_linux_amd64.tar.gz
+<span class="ps">$ </span>curl -fLO https://github.com/agenticode/my/releases/download/<span data-r="version">&lt;version&gt;</span>/SHA256SUMS
+<span class="ps">$ </span>sha256sum -c --ignore-missing SHA256SUMS
+<span class="out">my_<span data-r="version">&lt;version&gt;</span>_linux_amd64.tar.gz: OK</span>
+<span class="ps">$ </span>tar -xzf my_<span data-r="version">&lt;version&gt;</span>_linux_amd64.tar.gz
+<span class="ps">$ </span>my_<span data-r="version">&lt;version&gt;</span>_linux_amd64/my version</code></pre>
+      <p class="lines"><span><code>--ignore-missing</code> skips the lines of files you did not download.</span><span>On a Mac without sha256sum, use <code>shasum -a 256 -c --ignore-missing SHA256SUMS</code>.</span></p>
+      <p class="lines"><span>macOS marks an archive downloaded in a browser as quarantined, and unpacking it marks <code>my</code> too.</span><span>The binary is not notarized by Apple, so macOS refuses to run it while the mark is there.</span><span>Remove the mark after unpacking: <code>xattr -d com.apple.quarantine my_<span data-r="version">&lt;version&gt;</span>_darwin_arm64/my</code></span><span>Files downloaded with curl are not marked.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="source" aria-labelledby="source-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">Source</p>
+    <div class="sec-body">
+      <h2 id="source-h">Build from source</h2>
+      <p class="lines"><span>You need Go&nbsp;1.26 or later, git and make.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Commands to build from source"><code><span class="ps">$ </span>git clone --depth 1 --branch <span data-r="version">&lt;version&gt;</span> https://github.com/agenticode/my
 <span class="ps">$ </span>cd my
 <span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
       <p class="lines"><span>The build is one file, <code>bin/my</code>.</span><span>It is built with <code>CGO_ENABLED=0</code>, so no C compiler is needed.</span></p>
-      <p class="lines"><span>Try it: <a class="link" href="/en/#start">Quick start</a></span><span>Releases: <a class="link" href="https://github.com/agenticode/my/releases">GitHub Releases</a></span></p>
+      <p class="lines"><span>How to build the same bytes as the release: <a class="link" data-href="https://github.com/agenticode/my/blob/{version}/docs/release.md" href="https://github.com/agenticode/my/blob/main/docs/release.md">docs/release.md</a></span><span>Try it: <a class="link" href="/en/#start">Quick start</a></span></p>
     </div>
   </div>
 </section>

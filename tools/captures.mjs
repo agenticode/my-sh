@@ -98,13 +98,14 @@ const REPORT = {
   argv: ['my', 'report'],
 };
 
-// Blocks of text on the page. The quick start runs the binary `make build` wrote.
+// Blocks of text on the page. The quick start runs `my` from the top of the
+// repository, as a reader does after the install script and `git clone`.
 const BLOCKS = [
   { name: 'lab-verify', dir: 'testdata/real', cols: 80, label: each('my verify 실행 결과', 'Output of my verify'),
     runs: [{ argv: ['my', 'verify', '--root', MULTI, '--expect', `${MULTI}/plan.yaml`] }] },
   // In English the table keeps its trend column from 84 columns on, as the Korean one does at 76.
-  { name: 'start-scan', dir: '.', cols: each(76, 84), label: each('bin/my 실행 결과', 'Output of bin/my'),
-    runs: [{ argv: ['bin/my', '--root', `testdata/real/${MULTI}`] }] },
+  { name: 'start-scan', dir: '.', cols: each(76, 84), label: each('my 실행 결과', 'Output of my'),
+    runs: [{ argv: ['my', '--root', `testdata/real/${MULTI}`] }] },
 ];
 
 // The look of a terminal block; site/css/site.css has the same rules for the page.

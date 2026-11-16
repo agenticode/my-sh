@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>다운로드 | MemorY</title>
-<meta name="description" content="MemorY 첫 릴리스는 준비 중입니다. 그때까지는 소스에서 빌드합니다. Go 1.26 이상, git, make가 필요합니다.">
+<meta name="description" content="MemorY를 받는 곳. Linux(x86-64, ARM64)와 macOS(Apple 실리콘)용 압축 파일, SHA-256 체크섬, 한 줄 설치 스크립트, 소스 빌드 방법.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/ko/download/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://my.sh/ko/download/">
 <meta property="og:title" content="다운로드 | MemorY">
-<meta property="og:description" content="MemorY 첫 릴리스는 준비 중입니다. 그때까지는 소스에서 빌드합니다. Go 1.26 이상, git, make가 필요합니다.">
+<meta property="og:description" content="MemorY를 받는 곳. Linux(x86-64, ARM64)와 macOS(Apple 실리콘)용 압축 파일, SHA-256 체크섬, 한 줄 설치 스크립트, 소스 빌드 방법.">
 <meta property="og:image" content="https://my.sh/og.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,8 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
+<link rel="stylesheet" href="/css/site.css?v=b66768ae">
+<script src="/js/download.js?v=1c4b9257" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -58,19 +59,116 @@
   </div>
 </header>
 
-<main id="main">
+<main id="main" data-release>
 
 <section class="sec page-top" aria-labelledby="dl-h">
   <div class="wrap sec-grid">
     <p class="sec-tag">다운로드</p>
     <div class="sec-body">
-      <h1 id="dl-h">첫 릴리스는 준비 중입니다</h1>
-      <p class="lines"><span>그때까지는 소스에서 빌드합니다.</span><span>필요한 것: Go&nbsp;1.26 이상, git, make</span></p>
-      <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
+      <h1 id="dl-h">MemorY <span class="nowrap" data-r="version"></span></h1>
+      <dl class="spec rel-ready">
+        <div><dt>공개일</dt><dd><time data-r="date"></time></dd></div>
+        <div><dt>릴리스 노트</dt><dd><a class="link" data-r="notes" href="https://github.com/agenticode/my/releases/latest">GitHub</a></dd></div>
+        <div><dt>커밋</dt><dd><code data-r="commit"></code></dd></div>
+      </dl>
+      <noscript><p class="lines"><span>이 페이지는 릴리스 정보를 <a class="link" href="/release.json">release.json</a>에서 읽어 채웁니다.</span><span>파일은 <a class="link" href="https://github.com/agenticode/my/releases/latest">GitHub 릴리스</a>에서 받습니다.</span></p></noscript>
+      <p class="lines rel-failed" role="alert"><span>릴리스 정보(<a class="link" href="/release.json">release.json</a>)를 읽지 못했습니다.</span><span>파일은 <a class="link" href="https://github.com/agenticode/my/releases/latest">GitHub 릴리스</a>에서 받습니다.</span></p>
+      <p class="lines"><span>Linux와 macOS 터미널에서 한 줄로 설치합니다.</span></p>
+      <pre class="term term-cmd term-big" tabindex="0" role="region" aria-label="설치 명령"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
+      <p class="lines"><span>스크립트가 하는 일과 그 내용: <a class="link" href="#install">설치 스크립트</a></span><span>파일별 크기와 SHA-256: <a class="link" href="#files">릴리스 파일</a></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="install" aria-labelledby="install-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">설치</p>
+    <div class="sec-body">
+      <h2 id="install-h">설치 스크립트</h2>
+      <p class="lines"><span>이 기기에 맞는 압축 파일과 SHA256SUMS를 GitHub 릴리스에서 HTTPS로 받습니다.</span><span>압축 파일의 SHA-256이 SHA256SUMS와 release.json의 값에 모두 맞을 때만 설치합니다.</span><span>하나라도 다르면 멈추고 아무것도 설치하지 않습니다.</span></p>
+      <p class="lines"><span><code>my</code>는 <code>~/.local/bin</code>에 둡니다.</span><span>sudo를 쓰지 않고 셸 설정 파일도 고치지 않습니다.</span><span>그 디렉터리가 PATH에 없으면 추가할 줄을 출력합니다.</span><span>끝으로 <code>my version</code>을 실행합니다.</span></p>
+      <dl class="spec">
+        <div><dt><code>MY_INSTALL_DIR</code></dt><dd>설치할 디렉터리</dd></div>
+        <div><dt><code>MY_VERSION</code></dt><dd>설치할 버전. 이때는 GitHub의 SHA256SUMS로만 확인합니다.</dd></div>
+      </dl>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="버전을 고른 설치 명령"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | MY_VERSION=<span data-r="version">&lt;버전&gt;</span> sh</code></pre>
+      <p class="lines"><span>실행하기 전에 읽어 보려면 파일로 받습니다.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="받아서 읽고 실행하는 명령"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get -o get.sh
+<span class="ps">$ </span>less get.sh
+<span class="ps">$ </span>sh get.sh</code></pre>
+      <p class="lines"><span>지금 <a class="link" href="/get">my.sh/get</a>이 내보내는 스크립트입니다.</span></p>
+      <pre class="term term-out script" tabindex="0" role="region" aria-label="설치 스크립트 get.sh" hidden><code data-r="script"></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="files" aria-labelledby="files-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">파일</p>
+    <div class="sec-body">
+      <h2 id="files-h">릴리스 파일</h2>
+      <p class="lines"><span>압축 파일마다 <code>my</code> 실행 파일, LICENSE, README.md가 들어 있습니다.</span><span>바이너리는 정적 링크라서 따로 설치할 라이브러리가 없습니다.</span></p>
+      <ul class="files rel-ready">
+        <li data-platform="linux/amd64">
+          <h3>Linux x86-64</h3>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>크기</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+        <li data-platform="linux/arm64">
+          <h3>Linux ARM64</h3>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>크기</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+        <li data-platform="darwin/arm64">
+          <h3>macOS, Apple 실리콘</h3>
+          <p class="note">케이스 번들을 열고 보고서를 쓰는 용도입니다.</p>
+          <p class="file"><a class="link" data-f="file" href="https://github.com/agenticode/my/releases/latest"></a></p>
+          <dl class="spec">
+            <div><dt>크기</dt><dd><span class="nowrap" data-f="size"></span></dd></div>
+            <div><dt>SHA-256</dt><dd><code class="hash" data-f="sha256"></code></dd></div>
+          </dl>
+        </li>
+      </ul>
+      <p class="lines rel-ready"><span>체크섬 목록: <a class="link" data-r="sums" href="https://github.com/agenticode/my/releases/latest">SHA256SUMS</a></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="verify" aria-labelledby="verify-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">확인</p>
+    <div class="sec-body">
+      <h2 id="verify-h">받은 파일 확인</h2>
+      <p class="lines"><span>압축 파일과 SHA256SUMS를 같은 디렉터리에 받습니다.</span><span><code>sha256sum -c</code>가 목록의 값과 파일을 맞춰 봅니다.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="받고 확인하는 명령"><code><span class="ps">$ </span>curl -fLO https://github.com/agenticode/my/releases/download/<span data-r="version">&lt;버전&gt;</span>/my_<span data-r="version">&lt;버전&gt;</span>_linux_amd64.tar.gz
+<span class="ps">$ </span>curl -fLO https://github.com/agenticode/my/releases/download/<span data-r="version">&lt;버전&gt;</span>/SHA256SUMS
+<span class="ps">$ </span>sha256sum -c --ignore-missing SHA256SUMS
+<span class="out">my_<span data-r="version">&lt;버전&gt;</span>_linux_amd64.tar.gz: OK</span>
+<span class="ps">$ </span>tar -xzf my_<span data-r="version">&lt;버전&gt;</span>_linux_amd64.tar.gz
+<span class="ps">$ </span>my_<span data-r="version">&lt;버전&gt;</span>_linux_amd64/my version</code></pre>
+      <p class="lines"><span><code>--ignore-missing</code>은 받지 않은 파일의 줄을 건너뜁니다.</span><span>sha256sum이 없는 macOS에서는 <code>shasum -a 256 -c --ignore-missing SHA256SUMS</code>를 씁니다.</span></p>
+      <p class="lines"><span>브라우저로 받은 압축 파일에는 macOS가 격리 속성을 붙이고, 풀면 <code>my</code>에도 붙습니다.</span><span>이 바이너리는 Apple 공증을 받지 않아서, 그 속성이 있으면 macOS가 실행을 막습니다.</span><span>풀고 나서 지웁니다: <code>xattr -d com.apple.quarantine my_<span data-r="version">&lt;버전&gt;</span>_darwin_arm64/my</code></span><span>curl로 받은 파일에는 이 속성이 붙지 않습니다.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="source" aria-labelledby="source-h">
+  <div class="wrap sec-grid">
+    <p class="sec-tag">소스</p>
+    <div class="sec-body">
+      <h2 id="source-h">소스에서 빌드</h2>
+      <p class="lines"><span>필요한 것: Go&nbsp;1.26 이상, git, make</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="소스 빌드 명령"><code><span class="ps">$ </span>git clone --depth 1 --branch <span data-r="version">&lt;버전&gt;</span> https://github.com/agenticode/my
 <span class="ps">$ </span>cd my
 <span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
       <p class="lines"><span>빌드 결과는 <code>bin/my</code> 파일 하나입니다.</span><span><code>CGO_ENABLED=0</code>으로 빌드하므로 C 컴파일러는 필요 없습니다.</span></p>
-      <p class="lines"><span>실행해 보기: <a class="link" href="/ko/#start">빠른 시작</a></span><span>릴리스 목록: <a class="link" href="https://github.com/agenticode/my/releases">GitHub Releases</a></span></p>
+      <p class="lines"><span>릴리스와 같은 바이트로 빌드하는 법: <a class="link" data-href="https://github.com/agenticode/my/blob/{version}/docs/release.md" href="https://github.com/agenticode/my/blob/main/docs/release.md">docs/release.md</a></span><span>실행해 보기: <a class="link" href="/ko/#start">빠른 시작</a></span></p>
     </div>
   </div>
 </section>
