@@ -2,7 +2,7 @@
 
 Source of <https://my.sh>, the project site for [MemorY](https://github.com/agenticode/my).
 
-The site is one static page in two languages: `site/ko/` (Korean) and `site/en/` (English), each with an `index.html` and a `404.html`. There is no build step and no framework. The pages make no requests to other hosts: fonts, styles and scripts are all served from `site/`.
+The site has two pages in two languages, Korean in `site/ko/` and English in `site/en/`: the overview (`index.html`) and the download page (`download/index.html`), and a `404.html` for each language. There is no build step and no framework. The pages make no requests to other hosts: fonts, styles and scripts are all served from `site/`.
 
 ## Preview
 
@@ -12,9 +12,15 @@ Serve `site/` as the web root. Asset paths are absolute (`/css/site.css`, `/font
 python3 -m http.server -d site 8599
 ```
 
-Then open <http://127.0.0.1:8599/ko/> or <http://127.0.0.1:8599/en/>. The page at `/` is picked by the production server (see [Languages](#languages)); a plain file server has none.
+Then open <http://127.0.0.1:8599/ko/>, <http://127.0.0.1:8599/en/> or the download pages under them (`/ko/download/`). The page at `/` is picked by the production server (see [Languages](#languages)); a plain file server has none.
 
 The production server sends `script-src 'self'`, so scripts go in files under `site/js/`. Inline `<script>` blocks do not run.
+
+## Menu and text
+
+The top menu has three entries in both languages: the overview (`/ko/`, `/en/`), the download page (`/ko/download/`, `/en/download/`) and the blog (<https://linux.io/> for Korean, <https://linux.io/en/> for English, in the same tab). The sections of the overview are not in the menu. The link of the page itself carries `aria-current="page"`. On phones (44rem and narrower) the menu moves to a second row of the banner.
+
+Sentences that belong together in a short block go on a line each: the block gets the class `lines` and every sentence its own `<span>` (`<p class="lines"><span>...</span><span>...</span></p>`). Longer explanations stay paragraphs, one subject per paragraph.
 
 ## After editing CSS or JS
 
@@ -88,11 +94,11 @@ The server caches `/fonts/` as immutable. The file names carry the font version 
 
 ## Languages
 
-`/ko/` and `/en/` always serve their language. Each page names both in `<link rel="alternate" hreflang>` (with `x-default` for `/`), has its own canonical URL, and has a switch in the banner that links to `/?lang=ko` and `/?lang=en`.
+Paths under `/ko/` and `/en/` always serve their language. Each page names both languages in `<link rel="alternate" hreflang>` (with `x-default` for the path without a prefix), has its own canonical URL, and has a switch in the banner: `/?lang=ko` and `/?lang=en` on the overview and the 404 page, `/download/?lang=ko` and `/download/?lang=en` on the download page.
 
-The server picks the page for `/` (and for `/404` and a missing page) in this order:
+The server picks the page for `/`, `/download/` and every other path outside `/ko/` and `/en/` (also `/404` and a missing page) in this order:
 
-1. The `lang` cookie. `/?lang=ko` or `/?lang=en` sets it for one year (`SameSite=Lax`) and redirects to `/`.
+1. The `lang` cookie. `?lang=ko` or `?lang=en` on any path sets it for one year (`SameSite=Lax`) and redirects to the same path without the language prefix: `/?lang=en` goes to `/`, `/download/?lang=en` and `/ko/download/?lang=en` to `/download/`. A path with characters other than letters, digits, `.`, `_`, `~`, `-` and `/` is sent to `/`.
 2. The address of the visitor. Addresses in the Korean ranges get Korean; all others get English. The ranges are the aggregated KR zones of [ipdeny](https://www.ipdeny.com/ipblocks/), IPv4 and IPv6. The server keeps a copy next to itself and downloads them once a day; a download that fails, has a line that is not a range, or is much shorter than usual (fewer than 900 IPv4 or 100 IPv6 ranges) is dropped and the last good copy stays. Addresses of the server's own network count as Korean, because the server stands in Korea and its local network reaches it through the router.
 3. On any error (no list, an unreadable address, a cookie other than `ko` or `en`) the English page, and one line in the server log.
 
