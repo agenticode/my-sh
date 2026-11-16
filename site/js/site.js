@@ -56,6 +56,27 @@
     }
   }
 
+  /* ---- 터미널 블록: 한글 한 글자가 꼭 두 칸을 차지하도록 자간을 잰다 ----
+     한글은 읽는 사람의 시스템 글꼴로 그려져 폭이 기기마다 다르다. 두 칸(숫자 0 두 개)과의 차이를
+     글자 사이에 둔다(site.css 의 .term-out .w). tools/captures.mjs 의 그림도 같은 방법을 쓴다. */
+  function measureTerm() {
+    const pre = $('.term-out');
+    if (!pre) return;
+    const width = (text, weight) => {
+      const el = document.createElement('span');
+      el.textContent = text;
+      el.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font-size:100px;font-weight:${weight}`;
+      pre.appendChild(el);
+      const w = el.getBoundingClientRect().width;
+      el.remove();
+      return w;
+    };
+    const two = (2 * width('0000000000', 460)) / 10;
+    const ko = '가나다라마바사아자차';
+    root.style.setProperty('--kls', ((two - width(ko, 460) / 10) / 100).toFixed(4) + 'em');
+    root.style.setProperty('--klsb', ((two - width(ko, 700) / 10) / 100).toFixed(4) + 'em');
+  }
+
   /* ---- 인트로: MemorY → MY → MY.sh → 배너로 ----
      시간은 ms. 로고가 배너에 닿는 때가 약 3.2 초다. */
   const T = {
@@ -164,6 +185,10 @@
 
   function init() {
     initCaptures();
+    if (document.fonts && document.fonts.load && $('.term-out')) {
+      Promise.all(['460 1em "Geist Mono"', '460 1em "Term Ko"', '700 1em "Term Ko"']
+        .map((font) => document.fonts.load(font, '0가').catch(() => {}))).then(measureTerm);
+    }
     if (root.dataset.intro === 'play') runIntro();
   }
 
