@@ -57,20 +57,22 @@ The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `tr
 
 ## Captures
 
-Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the two text blocks (the `my verify` run in the lab section and the first screen of the quick start). One command makes all of them:
+Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the three text blocks (the slot map and DIMM table in the hero, the `my verify` run in the lab section and the first screen of the quick start). One command makes all of them:
 
 ```
 node tools/captures.mjs --repo ../my
 ```
 
-The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`, once per page language. Every command runs in a pseudo-terminal of a fixed width with the locale of that language, `ko_KR.UTF-8` or `en_US.UTF-8` (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed; a figure may leave out whole lines (`keep` of a run in the script). Then the script
+The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`, once per page language. Every command runs in a pseudo-terminal of a fixed width with the locale of that language, `ko_KR.UTF-8` or `en_US.UTF-8` (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed. A figure may leave out whole lines: `keep` ends a run at a line, `from` starts it at one, `crop` keeps a range and `drop` leaves out the lines that match a pattern. Then the script
 
 - renders each figure with Chrome and writes `site/captures/<lang>/<name>.webp`, 1600 px wide;
 - writes the path, width and height of each image into its `<figure>` in `site/<lang>/index.html`, and the ratio of the frame when it is not 16:10;
 - replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/<lang>/index.html`;
 - writes nothing when an output holds a path of the machine it ran on.
 
-`--lang ko` or `--lang en` makes one language only. Two runs print longer lines in English and get a wider terminal there: the address maps 60 columns (Korean 58) and the quick start 84 (Korean 76).
+`--lang ko` or `--lang en` makes one language only. Some runs print longer lines in one language and get a wider terminal there: the address maps 60 columns in English (Korean 58), the quick start 84 (Korean 76), the hero 53 (Korean 52).
+
+The hero shows `my --root 6.19.10-ghes-multi` from the line of the host finding to the end of the DIMM table, without the legend of the slot map (the table names the grade of each DIMM in the colour of its slot). Its font size follows the width of its box, so all 52 or 53 columns fit: about 11 px on a 390 px phone and 14 px from 768 px on.
 
 `--shots DIR` keeps the PNG of each figure (in `DIR/<lang>/`) and the raw output of each run. It needs git, make, Go, python3, cwebp and Chrome (`CHROME` if Chrome is not in the default macOS location).
 
@@ -83,9 +85,11 @@ The script clones the MemorY repository at `origin/main` (`--ref` picks another 
 | Another DIMM each boot | `boots-spread.webp` | in `6.19.10-ghes-loop-spread`: `my open var/lib/my/ledger.db boots`, then `... why --oneline \| tail -n 1` |
 | Verdict card | `verdict-card.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db why 'DIMM 0'` |
 | Preflight | `preflight.webp` | `my preflight --root 6.19.10-bert-loop` |
+| Fault shapes (legend) | `mode-single.webp`, `mode-row.webp`, `mode-column.webp`, `mode-bank.webp` | the grid of `my map --root 6.19.10-ghes-multi` for CPU0_A1, CPU0_D1, CPU0_B1 and CPU0_E1, without prompt and title bar, 960 x 600 |
+| Repair | `repair.webp` | `my dimm --root 7.3.0-cxl-repair` for `cxl:mem1` (quiet after its repair) and `cxl:mem0` (errors again), each up to its bars |
 | Report | `report.webp` | `my import 6.19.10-ghes-multi 6.19.10-ghes-multi/journal-all.json`, then `my report` of that bundle |
 
-Until an image loads, its frame shows a gray skeleton. The server caches images for one hour, so a replaced file can take that long to show.
+Until an image loads, its frame is empty; an image that fails to load is hidden. The server caches images for one hour, so a replaced file can take that long to show.
 
 The text blocks keep the colours of the run as classes (`b` bold, `d` dim, `c31` to `c36` for the colours). A terminal column is one `ch` of Geist Mono. Box and block characters come from a subset of JetBrains Mono that has the same advance. Hangul comes from the reader's system font (`Term Ko` in `site/css/site.css`, `size-adjust: 118%`); `site/js/site.js` measures it and spaces each character to two columns. The figure pages of `tools/captures.mjs` use the same fonts and the same measurement.
 
