@@ -1,0 +1,15 @@
+{
+  "name": "MemorY",
+  "version": "v1.0.0",
+  "date": "2026-11-16",
+  "published": "2026-11-16T17:22:06Z",
+  "commit": "0a19e609ed4ecd4c91d7bc8f9a2fe8da692afce7",
+  "repository": "https://github.com/agenticode/my",
+  "notes": "https://github.com/agenticode/my/releases/tag/v1.0.0",
+  "sums": {"file":"SHA256SUMS","url":"https://github.com/agenticode/my/releases/download/v1.0.0/SHA256SUMS","size":286},
+  "archives": [
+    {"os":"linux","arch":"amd64","file":"my_v1.0.0_linux_amd64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_amd64.tar.gz","size":8307514,"sha256":"ae44bdb1781b6fc02b0c64ad14820eb0ba038f6f6b6feaf9c7a97fe2fd2da5c6"},
+    {"os":"linux","arch":"arm64","file":"my_v1.0.0_linux_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_arm64.tar.gz","size":7621635,"sha256":"3a16c45eb2f3bab6cf932fe20bb7b2d06a00f11ada9efb2428f1b6bc23ae1679"},
+    {"os":"darwin","arch":"arm64","file":"my_v1.0.0_darwin_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_darwin_arm64.tar.gz","size":7792378,"sha256":"4b6fd335f437c5de2c94a5f4e8db0f37f5d7445f237dd7bfdf988a02300d09b7"}
+  ]
+}
