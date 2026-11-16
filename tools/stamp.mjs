@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Rewrites the ?v= value on local stylesheet and script URLs in site/*.html.
+// Rewrites the ?v= value on local stylesheet and script URLs in the HTML pages
+// of site/ and its subdirectories (site/ko, site/en).
 // The value is the first 8 hex digits of the file's SHA-256, so a changed file
 // gets a new URL and browsers stop using the copy they cached.
 //
@@ -16,7 +17,8 @@ const check = process.argv.includes('--check');
 const attr = /\b(href|src)="(\/(?:css|js)\/[^"?#]+)(?:\?v=[0-9a-f]*)?"/g;
 
 let stale = 0;
-for (const name of readdirSync(site).filter((f) => f.endsWith('.html'))) {
+const pages = readdirSync(site, { recursive: true }).filter((f) => f.endsWith('.html')).sort();
+for (const name of pages) {
   const file = join(site, name);
   const before = readFileSync(file, 'utf8');
   const after = before.replace(attr, (whole, key, path) => {

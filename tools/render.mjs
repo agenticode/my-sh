@@ -3,7 +3,8 @@
 //
 //   node tools/render.mjs
 //
-//   tools/og.svg      -> site/og.png (1200 x 630)
+//   tools/og.svg      -> site/og.png (1200 x 630), the share image of the Korean page
+//   tools/og-en.svg   -> site/og-en.png (1200 x 630), the same for the English page
 //   site/favicon.svg  -> site/apple-touch-icon.png (180 x 180, square corners)
 //                        site/favicon.ico (32 x 32 PNG in an ICO container)
 //
@@ -44,6 +45,7 @@ const page = (svg, size) => {
 
 try {
   shot(join(root, 'tools', 'og.svg'), join(root, 'site', 'og.png'), 1200, 630);
+  shot(join(root, 'tools', 'og-en.svg'), join(root, 'site', 'og-en.png'), 1200, 630);
   shot(page(icon.replace('rx="7"', 'rx="0"'), 180), join(root, 'site', 'apple-touch-icon.png'), 180, 180);
 
   const png32 = join(tmp, 'icon-32.png');
@@ -60,7 +62,7 @@ try {
   header.writeUInt32LE(22, 18);          // image offset
   writeFileSync(join(root, 'site', 'favicon.ico'), Buffer.concat([header, png]));
 
-  for (const name of ['og.png', 'apple-touch-icon.png']) {
+  for (const name of ['og.png', 'og-en.png', 'apple-touch-icon.png']) {
     console.log(name, pngSize(join(root, 'site', name)).join(' x '));
   }
   console.log('favicon.ico', pngSize(png32).join(' x '));
