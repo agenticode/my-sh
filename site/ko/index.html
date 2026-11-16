@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MemorY, 읽기 전용 메모리 오류 분석 도구</title>
-<meta name="description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구이며 지금 개발 중입니다.">
+<meta name="description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구입니다.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/ko/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://my.sh/ko/">
 <meta property="og:title" content="MemorY, 읽기 전용 메모리 오류 분석 도구">
-<meta property="og:description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구이며 지금 개발 중입니다.">
+<meta property="og:description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구입니다.">
 <meta property="og:image" content="https://my.sh/og.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
+<link rel="stylesheet" href="/css/site.css?v=b66768ae">
 <script src="/js/site.js?v=58662300"></script>
 </head>
 <body>
@@ -78,7 +78,7 @@
       <div class="hero-actions" data-enter style="--e:3">
         <a class="btn" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub <span class="mono">agenticode/my</span></a>
         <a class="link" href="#start">빠른 시작</a>
-        <span class="chip">개발 중</span>
+        <a class="link" href="/ko/download/">다운로드</a>
       </div>
     </div>
     <div class="hero-art">
@@ -373,15 +373,16 @@
   <div class="wrap sec-grid">
     <p class="sec-tag">시작</p>
     <div class="sec-body">
-      <h2 id="start-h">빠른 시작 <span class="chip">개발 중</span></h2>
-      <p class="lines"><span>MemorY는 바이너리 하나입니다.</span><span>인자 없이 실행합니다.</span></p>
+      <h2 id="start-h">빠른 시작</h2>
+      <p class="lines"><span>MemorY는 바이너리 하나입니다.</span><span>Linux와 macOS 터미널에서 한 줄로 설치합니다.</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="설치 명령"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
+      <p class="lines"><span>스크립트 내용, 파일별 체크섬, 소스 빌드: <a class="link" href="/ko/download/">다운로드</a></span></p>
+      <p class="lines"><span>서버에서는 인자 없이 실행합니다.</span></p>
       <pre class="term term-one"><code><span class="ps">$ </span>my</code></pre>
-      <p class="lines"><span>첫 릴리스는 준비 중입니다.</span><span>지금은 소스에서 빌드합니다.</span><span>Go&nbsp;1.26 이상이 필요합니다.</span></p>
-      <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
-<span class="ps">$ </span>cd my
-<span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
       <p class="lines"><span>서버가 없으면 저장소에 든 랩 캡처로 돌려 봅니다.</span><span><code>--root</code>에 캡처 디렉터리를 주면 그 호스트의 파일을 읽습니다.</span><span>로케일이 한국어면 출력도 한국어입니다.</span></p>
-      <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="bin/my 실행 결과" style="--cols:76"><code><span class="ps">$ </span>bin/my --root testdata/real/6.19.10-ghes-multi
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="저장소를 받는 명령"><code><span class="ps">$ </span>git clone --depth 1 https://github.com/agenticode/my
+<span class="ps">$ </span>cd my</code></pre>
+      <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="my 실행 결과" style="--cols:76"><code><span class="ps">$ </span>my --root testdata/real/6.19.10-ghes-multi
 <span class="w">호스트</span> <span class="b">lab-arm6</span>  QEMU lab-arm6  2026-11-14 ~ 2026-11-16  CE 35<span class="w">건</span>, UE 1<span class="w">건</span>
 <span class="w">관측</span> <span class="w">등급</span> A
 <span class="w">호스트</span> <span class="w">소견</span>: <span class="c33"><span class="w">교체</span> <span class="w">고려</span></span>
@@ -403,7 +404,7 @@
        UE<span class="w">도</span> <span class="w">게스트</span> <span class="w">메모리에</span> <span class="w">난</span> <span class="w">것까지만</span> <span class="w">보임</span>
 
  <span class="b">my dimm CPU0_E1 --root testdata/real/6.19.10-ghes-multi</span>: <span class="w">이</span> DIMM <span class="w">진찰</span> <span class="w">화면</span></code></pre><!-- /run:start-scan -->
-      <p class="lines"><span>명령 목록과 읽는 법: <code>bin/my help</code></span><span>개발 진행 상황: <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a></span></p>
+      <p class="lines"><span>명령 목록과 읽는 법: <code>my help</code></span><span>개발 진행 상황: <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a></span></p>
     </div>
   </div>
 </section>

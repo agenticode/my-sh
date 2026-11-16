@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MemorY, a read-only memory error analysis tool</title>
-<meta name="description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool, in development.">
+<meta name="description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/en/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="ko_KR">
 <meta property="og:url" content="https://my.sh/en/">
 <meta property="og:title" content="MemorY, a read-only memory error analysis tool">
-<meta property="og:description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool, in development.">
+<meta property="og:description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool.">
 <meta property="og:image" content="https://my.sh/og-en.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
+<link rel="stylesheet" href="/css/site.css?v=b66768ae">
 <script src="/js/site.js?v=58662300"></script>
 </head>
 <body>
@@ -78,7 +78,7 @@
       <div class="hero-actions" data-enter style="--e:3">
         <a class="btn" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub <span class="mono">agenticode/my</span></a>
         <a class="link" href="#start">Quick start</a>
-        <span class="chip">in development</span>
+        <a class="link" href="/en/download/">Download</a>
       </div>
     </div>
     <div class="hero-art">
@@ -372,15 +372,16 @@ host <span class="b">lab-arm6</span>  plan ghes-multi
   <div class="wrap sec-grid">
     <p class="sec-tag">Start</p>
     <div class="sec-body">
-      <h2 id="start-h">Quick start <span class="chip">in development</span></h2>
-      <p class="lines"><span>MemorY is one binary.</span><span>Run it with no arguments:</span></p>
+      <h2 id="start-h">Quick start</h2>
+      <p class="lines"><span>MemorY is one binary.</span><span>Install it from a Linux or macOS terminal with one line:</span></p>
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Install command"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
+      <p class="lines"><span>The script, the checksum of each file and how to build from source: <a class="link" href="/en/download/">Download</a></span></p>
+      <p class="lines"><span>On a server, run it with no arguments:</span></p>
       <pre class="term term-one"><code><span class="ps">$ </span>my</code></pre>
-      <p class="lines"><span>The first release is being prepared.</span><span>Until then, build it from source.</span><span>It needs Go&nbsp;1.26 or later.</span></p>
-      <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
-<span class="ps">$ </span>cd my
-<span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
       <p class="lines"><span>Without a server, try it on a lab capture of the repository.</span><span>With <code>--root</code> set to a capture directory it reads the files of that host.</span><span>Under a Korean locale it prints in Korean.</span></p>
-      <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of bin/my" style="--cols:84"><code><span class="ps">$ </span>bin/my --root testdata/real/6.19.10-ghes-multi
+      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Commands to get the repository"><code><span class="ps">$ </span>git clone --depth 1 https://github.com/agenticode/my
+<span class="ps">$ </span>cd my</code></pre>
+      <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of my" style="--cols:84"><code><span class="ps">$ </span>my --root testdata/real/6.19.10-ghes-multi
 host <span class="b">lab-arm6</span>  QEMU lab-arm6  2026-11-14 to 2026-11-16  CE 35, UE 1
 observation grade A
 host finding: <span class="c33">consider replacement</span>
@@ -403,7 +404,7 @@ host finding: <span class="c33">consider replacement</span>
           those that hit its own memory
 
  <span class="b">my dimm CPU0_E1 --root testdata/real/6.19.10-ghes-multi</span>: examination of this DIMM</code></pre><!-- /run:start-scan -->
-      <p class="lines"><span>Commands and how to read the screens: <code>bin/my help</code></span><span>Development progress: <a class="link" href="https://github.com/agenticode/my">GitHub repository</a></span></p>
+      <p class="lines"><span>Commands and how to read the screens: <code>my help</code></span><span>Development progress: <a class="link" href="https://github.com/agenticode/my">GitHub repository</a></span></p>
     </div>
   </div>
 </section>

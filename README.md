@@ -2,7 +2,7 @@
 
 Source of <https://my.sh>, the project site for [MemorY](https://github.com/agenticode/my).
 
-The site has two pages in two languages, Korean in `site/ko/` and English in `site/en/`: the overview (`index.html`) and the download page (`download/index.html`), and a `404.html` for each language. There is no build step and no framework. The pages make no requests to other hosts: fonts, styles and scripts are all served from `site/`.
+The site has two pages in two languages, Korean in `site/ko/` and English in `site/en/`: the overview (`index.html`) and the download page (`download/index.html`), and a `404.html` for each language. `site/get.sh` is the install script and `site/release.json` the current release (see [Release and install script](#release-and-install-script)). There is no build step and no framework. The pages make no requests to other hosts: fonts, styles and scripts are all served from `site/`.
 
 ## Preview
 
@@ -21,6 +21,25 @@ The production server sends `script-src 'self'`, so scripts go in files under `s
 The top menu has three entries in both languages: the overview (`/ko/`, `/en/`), the download page (`/ko/download/`, `/en/download/`) and the blog (<https://linux.io/> for Korean, <https://linux.io/en/> for English, in the same tab). The sections of the overview are not in the menu. The link of the page itself carries `aria-current="page"`. On phones (44rem and narrower) the menu moves to a second row of the banner.
 
 Sentences that belong together in a short block go on a line each: the block gets the class `lines` and every sentence its own `<span>` (`<p class="lines"><span>...</span><span>...</span></p>`). Longer explanations stay paragraphs, one subject per paragraph.
+
+## Release and install script
+
+`site/release.json` describes the current release of MemorY: its version, date, commit and release notes, and for each archive the file name, URL, size and SHA-256. The download pages and the install script read it when they run: `site/js/download.js` fills the pages in the browser, and `site/get.sh`, served as text at `https://my.sh/get`, takes its version and checksums from it. A new release changes only this file:
+
+```
+node tools/release.mjs v1.1.0
+```
+
+The script reads the release from the GitHub API, downloads `SHA256SUMS` and every archive named `my_<version>_<os>_<arch>.tar.gz`, and writes the file only when each archive matches its line in `SHA256SUMS`, the digest GitHub keeps for it and its size. Without a tag it takes the latest release. Commit the file and deploy.
+
+`site/get.sh` is a POSIX `sh` script. It picks the archive for linux/amd64, linux/arm64 or darwin/arm64 and stops with exit status 1 on any other system. It downloads the archive and `SHA256SUMS` from the GitHub release over HTTPS, compares the archive's SHA-256 with `SHA256SUMS` and with `release.json`, and stops on a difference. It installs `my` into `~/.local/bin` (`MY_INSTALL_DIR` picks another directory) without sudo, prints the line to add when that directory is not in `PATH`, and runs `my version`. `MY_VERSION` installs another version, checked against `SHA256SUMS` only. The download pages show the script as the server sends it.
+
+```
+node --test
+shellcheck -s sh site/get.sh
+```
+
+The tests run the script under `/bin/sh` and, when it is installed, `dash`, against a local HTTPS server with a made-up release: an install for each platform, a wrong checksum in `SHA256SUMS` and in `release.json`, a pinned version and directory, systems without an archive, and a broken `release.json`. They need curl, tar and openssl.
 
 ## After editing CSS or JS
 
@@ -102,7 +121,7 @@ The server picks the page for `/`, `/download/` and every other path outside `/k
 2. The address of the visitor. Addresses in the Korean ranges get Korean; all others get English. The ranges are the aggregated KR zones of [ipdeny](https://www.ipdeny.com/ipblocks/), IPv4 and IPv6. The server keeps a copy next to itself and downloads them once a day; a download that fails, has a line that is not a range, or is much shorter than usual (fewer than 900 IPv4 or 100 IPv6 ranges) is dropped and the last good copy stays. Addresses of the server's own network count as Korean, because the server stands in Korea and its local network reaches it through the router.
 3. On any error (no list, an unreadable address, a cookie other than `ko` or `en`) the English page, and one line in the server log.
 
-The page at `/` is sent with `Vary: Cookie`, `Cache-Control: private, no-cache` and `Content-Language`. The server behind <https://my.sh> is not part of this repository.
+The page at `/` is sent with `Vary: Cookie`, `Cache-Control: private, no-cache` and `Content-Language`. For `/get` the server sends `site/get.sh` as `text/plain`; the script and `release.json` are revalidated on every request, as the pages are. The server behind <https://my.sh> is not part of this repository.
 
 ## Deploy
 
