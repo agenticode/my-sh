@@ -5,14 +5,17 @@
 //
 // It clones the MemorY repository at REF (default origin/main of ../my), builds
 // it with `make build`, and runs the commands listed below on the lab captures
-// in its testdata/real. Every command runs in a pseudo-terminal of a fixed
-// width with a Korean locale (tools/ptyrun.py), so the tool chooses colours,
-// width and language as it does for a person at a terminal. What it printed is
-// used as it is; a figure may leave out whole lines (the `keep` of a run).
+// in its testdata/real, once for each page language. Every command runs in a
+// pseudo-terminal of a fixed width with the locale of that language
+// (tools/ptyrun.py), so the tool chooses colours, width and language as it does
+// for a person at a terminal. What it printed is used as it is; a figure may
+// leave out whole lines (the `keep` of a run).
 //
-//   figures   site/captures/<name>.webp, 1600 px wide, one per figure slot
+//   figures   site/captures/<lang>/<name>.webp, 1600 px wide, one per figure slot
 //   blocks    the <pre> between <!-- run:NAME --> and <!-- /run:NAME --> in
-//             site/index.html, as text with the colours of the run
+//             site/<lang>/index.html, as text with the colours of the run
+//
+// --lang ko or --lang en makes one language only; the default is both.
 //
 // Needs git, make, Go, python3, cwebp and Chrome (set CHROME if it is not in
 // the default macOS location). With --shots DIR the PNG of each figure and the
@@ -33,28 +36,37 @@ const MULTI = '6.19.10-ghes-multi'; // six DIMMs, four fault shapes
 const LOOP = '6.19.10-bert-loop'; // the same cell in three boots
 const SPREAD = '6.19.10-ghes-loop-spread'; // every boot another DIMM
 
+// The page languages and the locale their runs get.
+const LANGS = { ko: 'ko_KR.UTF-8', en: 'en_US.UTF-8' };
+
 // keep: which lines of the output a figure shows. Lines are counted from 1,
-// as the command printed them (before the terminal wraps a long line).
+// as the command printed them (before the terminal wraps a long line). A keep
+// that depends on the words of the output is given per language.
 const upto = (re) => (lines) => { const i = lines.findIndex((l) => re.test(l)); return i < 0 ? lines.length : i + 1; };
 const before = (re) => (lines) => { const i = lines.findIndex((l) => re.test(l)); return i < 0 ? lines.length : i; };
-const hint = /^ ?my (open |dimm |boots |why |help)|: (이 DIMM|판정 근거|판독법)/;
+const each = (ko, en) => ({ ko, en });
+const hint = /^ ?my (open |dimm |boots |why |help)|: (이 DIMM|판정 근거|판독법|examination of)/;
+
+// A map ends before the sentence about its fault.
+function mapKeep(ko) { return each(before(ko), before(/^ \S+ fault at /)); }
 
 const FIGURES = [
   {
     name: 'slot-map', dir: 'testdata/real', cols: 64,
-    panes: [[{ runs: [{ argv: ['my', 'scan', '--root', MULTI], keep: upto(/오류 없는 DIMM/) }] }]],
+    panes: [[{ runs: [{ argv: ['my', 'scan', '--root', MULTI], keep: each(upto(/오류 없는 DIMM/), upto(/DIMMs? without errors/)) }] }]],
   },
   {
     name: 'dimm', dir: 'testdata/real', cols: 72,
-    panes: [[{ runs: [{ argv: ['my', 'dimm', '--root', MULTI, 'CPU0_B1'], keep: before(/row x column/) }] }]],
+    panes: [[{ runs: [{ argv: ['my', 'dimm', '--root', MULTI, 'CPU0_B1'], keep: each(before(/row x column/), before(/row by column/)) }] }]],
   },
   {
-    name: 'address-map', dir: 'testdata/real', cols: 58, size: 'auto',
+    // In English the head of a map over one row is 59 columns wide.
+    name: 'address-map', dir: 'testdata/real', cols: each(58, 60), size: 'auto',
     panes: [
-      [{ runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_A1'], keep: before(/고장\(/) }] },
-        { runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_D1'], keep: before(/고장\(/) }] }],
-      [{ runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_B1'], keep: before(/^ \S+ 고장\(/) }] },
-        { runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_E1'], keep: before(/^ \S+ 고장\(/) }] }],
+      [{ runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_A1'], keep: mapKeep(/고장\(/) }] },
+        { runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_D1'], keep: mapKeep(/고장\(/) }] }],
+      [{ runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_B1'], keep: mapKeep(/^ \S+ 고장\(/) }] },
+        { runs: [{ argv: ['my', 'map', '--root', MULTI, 'CPU0_E1'], keep: mapKeep(/^ \S+ 고장\(/) }] }],
     ],
   },
   {
@@ -88,9 +100,10 @@ const REPORT = {
 
 // Blocks of text on the page. The quick start runs the binary `make build` wrote.
 const BLOCKS = [
-  { name: 'lab-verify', dir: 'testdata/real', cols: 80, label: 'my verify 실행 결과',
+  { name: 'lab-verify', dir: 'testdata/real', cols: 80, label: each('my verify 실행 결과', 'Output of my verify'),
     runs: [{ argv: ['my', 'verify', '--root', MULTI, '--expect', `${MULTI}/plan.yaml`] }] },
-  { name: 'start-scan', dir: '.', cols: 76, label: 'bin/my 실행 결과',
+  // In English the table keeps its trend column from 84 columns on, as the Korean one does at 76.
+  { name: 'start-scan', dir: '.', cols: each(76, 84), label: each('bin/my 실행 결과', 'Output of bin/my'),
     runs: [{ argv: ['bin/my', '--root', `testdata/real/${MULTI}`] }] },
 ];
 
@@ -124,6 +137,8 @@ const opt = (name) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1
 const repo = resolve(opt('--repo') || process.env.MY_REPO || join(root, '..', 'my'));
 const ref = opt('--ref') || 'origin/main';
 const shots = opt('--shots') ? resolve(opt('--shots')) : '';
+const langs = opt('--lang') ? [opt('--lang')] : Object.keys(LANGS);
+for (const l of langs) if (!LANGS[l]) throw new Error(`--lang ${l}: the page languages are ${Object.keys(LANGS).join(', ')}`);
 const chrome = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const cwebp = process.env.CWEBP || 'cwebp';
 
@@ -146,90 +161,110 @@ try {
   symlinkSync(join(src, 'bin', 'my'), join(tmp, 'bin', 'my'));
   console.log(sh(join(src, 'bin', 'my'), ['version']).trim());
 
-  const env = { PATH: `${join(tmp, 'bin')}:/usr/bin:/bin`, HOME: work, LANG: 'ko_KR.UTF-8', TERM: 'xterm-256color', TZ: 'UTC' };
   const outputs = [];
-  const sizes = { [REPORT.name]: [1600, 1000] };
+  const pages = {};
+  const written = [];
   let seq = 0;
 
-  // Runs one command in a terminal of `cols` columns; returns its lines.
-  const run = (dir, cols, r) => {
-    const argv = r.shell ? ['/bin/sh', '-c', r.shell] : r.argv;
-    const file = join(work, `run-${++seq}.ansi`);
-    const code = Number(sh('python3', [join(root, 'tools', 'ptyrun.py'), String(cols), file, ...argv], { cwd: join(src, dir), env }).trim());
-    const text = readFileSync(file, 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '');
-    if (code < 0 || code >= 64) throw new Error(`${prompt(r)} in ${dir}: exit ${code}\n${text}`);
-    if (!r.quiet) outputs.push(text);
-    if (shots) writeFileSync(join(shots, `run-${seq}.ansi`), `# ${dir}$ ${prompt(r)}\n${text}`);
-    let lines = text.replace(/\n+$/, '').split('\n');
-    if (r.keep) lines = lines.slice(0, r.keep(lines.map(plain)));
-    while (lines.length && plain(lines[lines.length - 1]).trim() === '') lines.pop();
-    return lines;
-  };
+  for (const lang of langs) {
+    const env = { PATH: `${join(tmp, 'bin')}:/usr/bin:/bin`, HOME: work, LANG: LANGS[lang], TERM: 'xterm-256color', TZ: 'UTC' };
+    const out = join(work, lang);
+    mkdirSync(out);
+    const sizes = { [REPORT.name]: [1600, 1000] };
 
-  // A pane is the prompt and the output of each of its runs.
-  const pane = (dir, cols, p) => {
-    const rows = [];
-    for (const r of p.runs) {
-      rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
-      for (const line of run(dir, cols, r)) rows.push(...wrap(cells(line), cols).map(html));
+    // Runs one command in a terminal of `cols` columns; returns its lines.
+    const run = (dir, cols, r) => {
+      const argv = r.shell ? ['/bin/sh', '-c', r.shell] : r.argv;
+      const file = join(work, `run-${++seq}.ansi`);
+      const code = Number(sh('python3', [join(root, 'tools', 'ptyrun.py'), String(cols), file, ...argv], { cwd: join(src, dir), env }).trim());
+      const text = readFileSync(file, 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '');
+      if (code < 0 || code >= 64) throw new Error(`${prompt(r)} in ${dir} (${lang}): exit ${code}\n${text}`);
+      if (!r.quiet) outputs.push(text);
+      if (shots) writeFileSync(join(shots, `run-${seq}.ansi`), `# ${lang} ${dir}$ ${prompt(r)}\n${text}`);
+      let lines = text.replace(/\n+$/, '').split('\n');
+      const keep = typeof r.keep === 'function' ? r.keep : r.keep?.[lang];
+      if (keep) lines = lines.slice(0, keep(lines.map(plain)));
+      while (lines.length && plain(lines[lines.length - 1]).trim() === '') lines.pop();
+      return lines;
+    };
+
+    // A pane is the prompt and the output of each of its runs.
+    const pane = (dir, cols, p) => {
+      const rows = [];
+      for (const r of p.runs) {
+        rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
+        for (const line of run(dir, cols, r)) rows.push(...wrap(cells(line), cols).map(html));
+      }
+      return rows;
+    };
+
+    for (const f of FIGURES) {
+      const cols = typeof f.cols === 'object' ? f.cols[lang] : f.cols;
+      const panes = f.panes.map((row) => row.map((p) => pane(f.dir, cols, p)));
+      const page = join(out, `${f.name}.html`);
+      writeFileSync(page, figurePage(f, panes, lang, cols));
+      const png = join(out, `${f.name}.png`);
+      const [w, h] = f.size === 'auto' ? [1600, autoHeight(page)] : f.size || [1600, 1000];
+      sizes[f.name] = [w, h];
+      screenshot(page, png, w, h, 1);
+      webp(png, join(out, `${f.name}.webp`));
     }
-    return rows;
-  };
 
-  for (const f of FIGURES) {
-    const panes = f.panes.map((row) => row.map((p) => pane(f.dir, f.cols, p)));
-    const page = join(work, `${f.name}.html`);
-    writeFileSync(page, figurePage(f, panes));
-    const png = join(work, `${f.name}.png`);
-    const [w, h] = f.size === 'auto' ? [1600, autoHeight(page)] : f.size || [1600, 1000];
-    sizes[f.name] = [w, h];
-    screenshot(page, png, w, h, 1);
-    webp(png, f.name);
-  }
+    const report = join(out, 'report.html');
+    const bundle = join(out, 'case.mycase');
+    run(REPORT.dir, 100, { argv: [...REPORT.import, bundle], quiet: true }); // these print the paths of their files
+    run(REPORT.dir, 100, { argv: [...REPORT.argv, bundle, '-o', report], quiet: true });
+    outputs.push(readFileSync(report, 'utf8'));
+    const rpng = join(out, 'report.png');
+    screenshot(report, rpng, 1280, 800, 1.25);
+    webp(rpng, join(out, `${REPORT.name}.webp`));
 
-  const report = join(work, 'report.html');
-  const bundle = join(work, 'case.mycase');
-  run(REPORT.dir, 100, { argv: [...REPORT.import, bundle], quiet: true }); // these print the paths of their files
-  run(REPORT.dir, 100, { argv: [...REPORT.argv, bundle, '-o', report], quiet: true });
-  outputs.push(readFileSync(report, 'utf8'));
-  const rpng = join(work, 'report.png');
-  screenshot(report, rpng, 1280, 800, 1.25);
-  webp(rpng, REPORT.name);
-
-  let index = readFileSync(join(site, 'index.html'), 'utf8');
-  for (const b of BLOCKS) {
-    const rows = [];
-    for (const r of b.runs) {
-      rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
-      for (const line of run(b.dir, b.cols, r)) rows.push(...wrap(cells(line), b.cols).map(html));
+    const file = `site/${lang}/index.html`;
+    let index = readFileSync(join(root, file), 'utf8');
+    for (const b of BLOCKS) {
+      const cols = typeof b.cols === 'object' ? b.cols[lang] : b.cols;
+      const rows = [];
+      for (const r of b.runs) {
+        rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
+        for (const line of run(b.dir, cols, r)) rows.push(...wrap(cells(line), cols).map(html));
+      }
+      const open = `<!-- run:${b.name} -->`, close = `<!-- /run:${b.name} -->`;
+      const a = index.indexOf(open), z = index.indexOf(close);
+      if (a < 0 || z < a) throw new Error(`${file} has no ${open} ... ${close}`);
+      const block = `<pre class="term term-out" tabindex="0" role="region" aria-label="${b.label[lang]}" style="--cols:${cols}"><code>${rows.join('\n')}</code></pre>`;
+      index = index.slice(0, a + open.length) + block + index.slice(z);
     }
-    const open = `<!-- run:${b.name} -->`, close = `<!-- /run:${b.name} -->`;
-    const a = index.indexOf(open), z = index.indexOf(close);
-    if (a < 0 || z < a) throw new Error(`site/index.html has no ${open} ... ${close}`);
-    const block = `<pre class="term term-out" tabindex="0" role="region" aria-label="${b.label}" style="--cols:${b.cols}"><code>${rows.join('\n')}</code></pre>`;
-    index = index.slice(0, a + open.length) + block + index.slice(z);
-  }
 
-  // The frame of each figure takes the shape of its image.
-  for (const [name, [w, h]] of Object.entries(sizes)) {
-    const at = index.indexOf(`data-capture="${name}"`);
-    const end = index.indexOf('</figure>', at);
-    if (at < 0 || end < 0) throw new Error(`site/index.html has no figure data-capture="${name}"`);
-    const fig = index.slice(at, end)
-      .replace(/<div class="capture-frame"[^>]*>/, w * 10 === h * 16 ? '<div class="capture-frame">' : `<div class="capture-frame" style="--ar:${w} / ${h}">`)
-      .replace(/(<img [^>]*?)width="\d+" height="\d+"/, `$1width="${w}" height="${h}"`);
-    index = index.slice(0, at) + fig + index.slice(end);
+    // Each figure shows the image of its language, and its frame takes the shape of that image.
+    for (const [name, [w, h]] of Object.entries(sizes)) {
+      const at = index.indexOf(`data-capture="${name}"`);
+      const end = index.indexOf('</figure>', at);
+      if (at < 0 || end < 0) throw new Error(`${file} has no figure data-capture="${name}"`);
+      const fig = index.slice(at, end)
+        .replace(/<div class="capture-frame"[^>]*>/, w * 10 === h * 16 ? '<div class="capture-frame">' : `<div class="capture-frame" style="--ar:${w} / ${h}">`)
+        .replace(/(<img [^>]*?)src="[^"]*"/, `$1src="/captures/${lang}/${name}.webp"`)
+        .replace(/(<img [^>]*?)width="\d+" height="\d+"/, `$1width="${w}" height="${h}"`);
+      index = index.slice(0, at) + fig + index.slice(end);
+    }
+    pages[file] = index;
   }
 
   // Nothing of the machine that made the screens may reach the page.
   const private_ = [tmp, homedir(), `/${userInfo().username}/`].filter((s) => s && s.length > 3);
-  for (const text of [...outputs, index]) {
+  for (const text of [...outputs, ...Object.values(pages)]) {
     for (const s of private_) if (text.includes(s)) throw new Error(`output holds "${s}"; nothing written`);
   }
-  writeFileSync(join(site, 'index.html'), index);
-  for (const f of [...FIGURES, REPORT]) copyFileSync(join(work, `${f.name}.webp`), join(site, 'captures', `${f.name}.webp`));
-  if (shots) for (const f of [...FIGURES, REPORT]) copyFileSync(join(work, `${f.name}.png`), join(shots, `${f.name}.png`));
-  console.log(`written: ${[...FIGURES, REPORT].map((f) => `captures/${f.name}.webp`).join(', ')}; ${BLOCKS.length} blocks in index.html`);
+  for (const [file, index] of Object.entries(pages)) writeFileSync(join(root, file), index);
+  for (const lang of langs) {
+    mkdirSync(join(site, 'captures', lang), { recursive: true });
+    if (shots) mkdirSync(join(shots, lang), { recursive: true });
+    for (const f of [...FIGURES, REPORT]) {
+      copyFileSync(join(work, lang, `${f.name}.webp`), join(site, 'captures', lang, `${f.name}.webp`));
+      if (shots) copyFileSync(join(work, lang, `${f.name}.png`), join(shots, lang, `${f.name}.png`));
+      written.push(`captures/${lang}/${f.name}.webp`);
+    }
+  }
+  console.log(`written: ${written.join(', ')}; ${BLOCKS.length} blocks in ${Object.keys(pages).join(', ')}`);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }
@@ -325,10 +360,10 @@ function html(cs) {
 
 function dataURL(file) { return `data:font/woff2;base64,${readFileSync(file).toString('base64')}`; }
 
-function figurePage(f, panes) {
+function figurePage(f, panes, lang, cols) {
   const title = `my/${f.dir === '.' ? '' : f.dir}`;
-  const grid = panes.map((row) => `<div class="row">${row.map((p) => `<pre style="--cols:${f.cols}">${p.join('\n')}</pre>`).join('')}</div>`).join('');
-  return `<!doctype html><html lang="ko"><meta charset="utf-8"><style>
+  const grid = panes.map((row) => `<div class="row">${row.map((p) => `<pre style="--cols:${cols}">${p.join('\n')}</pre>`).join('')}</div>`).join('');
+  return `<!doctype html><html lang="${lang}"><meta charset="utf-8"><style>
 @font-face{font-family:"Term Blocks";src:url(${dataURL(join(site, 'fonts', 'JetBrainsMono-Blocks-2.304.woff2'))}) format("woff2");unicode-range:U+2500-259F}
 @font-face{font-family:"Geist Mono";src:url(${dataURL(join(site, 'fonts', 'GeistMono-Variable-1.400.woff2'))}) format("woff2");font-weight:100 900}
 ${TERM_KO}
@@ -380,6 +415,6 @@ function autoHeight(page) {
   return Math.min(1600, Math.max(Math.round(1600 / 2.4), Number(m[1])));
 }
 
-function webp(png, name) {
-  execFileSync(cwebp, ['-quiet', '-q', '90', '-m', '6', png, '-o', join(work, `${name}.webp`)]);
+function webp(png, out) {
+  execFileSync(cwebp, ['-quiet', '-q', '90', '-m', '6', png, '-o', out]);
 }

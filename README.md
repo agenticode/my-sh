@@ -2,7 +2,7 @@
 
 Source of <https://my.sh>, the project site for [MemorY](https://github.com/agenticode/my).
 
-The site is one static page in `site/`. There is no build step and no framework. The page makes no requests to other hosts: fonts, styles and scripts are all served from `site/`.
+The site is one static page in two languages: `site/ko/` (Korean) and `site/en/` (English), each with an `index.html` and a `404.html`. There is no build step and no framework. The pages make no requests to other hosts: fonts, styles and scripts are all served from `site/`.
 
 ## Preview
 
@@ -12,7 +12,7 @@ Serve `site/` as the web root. Asset paths are absolute (`/css/site.css`, `/font
 python3 -m http.server -d site 8599
 ```
 
-Then open <http://127.0.0.1:8599/>.
+Then open <http://127.0.0.1:8599/ko/> or <http://127.0.0.1:8599/en/>. The page at `/` is picked by the production server (see [Languages](#languages)); a plain file server has none.
 
 The production server sends `script-src 'self'`, so scripts go in files under `site/js/`. Inline `<script>` blocks do not run.
 
@@ -22,7 +22,7 @@ The production server sends `script-src 'self'`, so scripts go in files under `s
 node tools/stamp.mjs
 ```
 
-The server lets browsers cache `site/css/` and `site/js/` for one hour. The script rewrites the `?v=` value on the link and script tags in `site/*.html` from each file's content, so an edited file is fetched again right away. `node tools/stamp.mjs --check` exits with 1 when a value is out of date.
+The server lets browsers cache `site/css/` and `site/js/` for one hour. The script rewrites the `?v=` value on the link and script tags of every page under `site/` from each file's content, so an edited file is fetched again right away. `node tools/stamp.mjs --check` exits with 1 when a value is out of date.
 
 ## Logo motion
 
@@ -38,14 +38,16 @@ Every terminal screen on the page is output of MemorY: the figure images in `sit
 node tools/captures.mjs --repo ../my
 ```
 
-The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`. Every command runs in a pseudo-terminal of a fixed width with a Korean locale (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed; a figure may leave out whole lines (`keep` of a run in the script). Then the script
+The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`, once per page language. Every command runs in a pseudo-terminal of a fixed width with the locale of that language, `ko_KR.UTF-8` or `en_US.UTF-8` (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed; a figure may leave out whole lines (`keep` of a run in the script). Then the script
 
-- renders each figure with Chrome and writes `site/captures/<name>.webp`, 1600 px wide;
-- writes the width and height of each image into its `<figure>` in `site/index.html`, and the ratio of the frame when it is not 16:10;
-- replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/index.html`;
+- renders each figure with Chrome and writes `site/captures/<lang>/<name>.webp`, 1600 px wide;
+- writes the path, width and height of each image into its `<figure>` in `site/<lang>/index.html`, and the ratio of the frame when it is not 16:10;
+- replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/<lang>/index.html`;
 - writes nothing when an output holds a path of the machine it ran on.
 
-`--shots DIR` keeps the PNG of each figure and the raw output of each run. It needs git, make, Go, python3, cwebp and Chrome (`CHROME` if Chrome is not in the default macOS location).
+`--lang ko` or `--lang en` makes one language only. Two runs print longer lines in English and get a wider terminal there: the address maps 60 columns (Korean 58) and the quick start 84 (Korean 76).
+
+`--shots DIR` keeps the PNG of each figure (in `DIR/<lang>/`) and the raw output of each run. It needs git, make, Go, python3, cwebp and Chrome (`CHROME` if Chrome is not in the default macOS location).
 
 | Figure | File | Commands, in `testdata/real` unless named |
 | --- | --- | --- |
@@ -68,7 +70,7 @@ The text blocks keep the colours of the run as classes (`b` bold, `d` dim, `c31`
 node tools/render.mjs
 ```
 
-This renders `tools/og.svg` to `site/og.png` (1200 x 630) and `site/favicon.svg` to `site/apple-touch-icon.png` and `site/favicon.ico` with a local Chrome. Set `CHROME` to the browser binary if it is not in the default macOS location. Run it after editing either SVG and commit the output.
+This renders `tools/og.svg` to `site/og.png` and `tools/og-en.svg` to `site/og-en.png` (1200 x 630, the share images of the Korean and the English page), and `site/favicon.svg` to `site/apple-touch-icon.png` and `site/favicon.ico` with a local Chrome. Set `CHROME` to the browser binary if it is not in the default macOS location. Run it after editing either SVG and commit the output.
 
 ## Fonts
 
@@ -82,7 +84,19 @@ pyftsubset JetBrainsMono-Regular.ttf --unicodes=U+2500-259F --flavor=woff2 \
   --output-file=JetBrainsMono-Blocks-2.304.woff2
 ```
 
-The server caches `/fonts/` as immutable. The file names carry the font version for that reason: a changed font file needs a new name and a matching edit in `site/css/site.css` and the preload link in `site/index.html`.
+The server caches `/fonts/` as immutable. The file names carry the font version for that reason: a changed font file needs a new name and a matching edit in `site/css/site.css` and the preload links in `site/ko/index.html` and `site/en/index.html`.
+
+## Languages
+
+`/ko/` and `/en/` always serve their language. Each page names both in `<link rel="alternate" hreflang>` (with `x-default` for `/`), has its own canonical URL, and has a switch in the banner that links to `/?lang=ko` and `/?lang=en`.
+
+The server picks the page for `/` (and for `/404` and a missing page) in this order:
+
+1. The `lang` cookie. `/?lang=ko` or `/?lang=en` sets it for one year (`SameSite=Lax`) and redirects to `/`.
+2. The address of the visitor. Addresses in the Korean ranges get Korean; all others get English. The ranges are the aggregated KR zones of [ipdeny](https://www.ipdeny.com/ipblocks/), IPv4 and IPv6. The server keeps a copy next to itself and downloads them once a day; a download that fails, has a line that is not a range, or is much shorter than usual (fewer than 900 IPv4 or 100 IPv6 ranges) is dropped and the last good copy stays. Addresses of the server's own network count as Korean, because the server stands in Korea and its local network reaches it through the router.
+3. On any error (no list, an unreadable address, a cookie other than `ko` or `en`) the English page, and one line in the server log.
+
+The page at `/` is sent with `Vary: Cookie`, `Cache-Control: private, no-cache` and `Content-Language`. The server behind <https://my.sh> is not part of this repository.
 
 ## Deploy
 
