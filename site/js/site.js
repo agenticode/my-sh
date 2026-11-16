@@ -40,7 +40,7 @@
     probe.remove();
   }
 
-  /* ---- 캡처 칸: captures/<이름>.webp 가 있으면 그 그림을, 없으면 뼈대를 보인다. ---- */
+  /* ---- 캡처 칸: 그림을 못 받으면 깨진 그림 대신 빈 칸을 둔다. ---- */
   function initCaptures() {
     for (const fig of document.querySelectorAll('[data-capture]')) {
       const img = $('img', fig);

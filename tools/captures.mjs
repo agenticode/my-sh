@@ -15,6 +15,12 @@
 //   blocks    the <pre> between <!-- run:NAME --> and <!-- /run:NAME --> in
 //             site/<lang>/index.html, as text with the colours of the run
 //
+// A run may also leave out lines by pattern (`drop`), start at a line
+// (`from`), and a pane may show no prompt (`prompt: false`). A figure marked
+// `inline` is an image the page shows without a figure frame (the shapes of
+// the fault modes); the page gives its size, and the run does not touch the
+// page for it.
+//
 // --lang ko or --lang en makes one language only; the default is both.
 //
 // Needs git, make, Go, python3, cwebp and Chrome (set CHROME if it is not in
@@ -33,6 +39,7 @@ const site = join(root, 'site');
 // ---- what the page shows ----------------------------------------------------
 
 const MULTI = '6.19.10-ghes-multi'; // six DIMMs, four fault shapes
+const REPAIR = '7.3.0-cxl-repair'; // two CXL devices, a soft PPR of one row each
 const LOOP = '6.19.10-bert-loop'; // the same cell in three boots
 const SPREAD = '6.19.10-ghes-loop-spread'; // every boot another DIMM
 
@@ -49,6 +56,19 @@ const hint = /^ ?my (open |dimm |boots |why |help)|: (이 DIMM|판정 근거|판
 
 // A map ends before the sentence about its fault.
 function mapKeep(ko) { return each(before(ko), before(/^ \S+ fault at /)); }
+
+// The grid of a map alone: from the line of the column axis to the last row.
+const mapGrid = (lines) => {
+  const a = lines.findIndex((l) => /^ row +0x0+ /.test(l));
+  let b = a + 1;
+  while (b < lines.length && /^ 0x[0-9a-f]+ +[·░▒▓█X]/.test(lines[b])) b++;
+  return a < 0 ? [0, lines.length] : [a, b];
+};
+// One figure per fault shape, for the legend under the address maps.
+const shape = (name, dimm) => ({
+  name, dir: 'testdata/real', cols: 56, size: [960, 600], inline: true, bar: false,
+  panes: [[{ prompt: false, runs: [{ argv: ['my', 'map', '--root', MULTI, dimm], crop: mapGrid }] }]],
+});
 
 const FIGURES = [
   {
@@ -88,6 +108,18 @@ const FIGURES = [
     name: 'preflight', dir: 'testdata/real', cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'preflight', '--root', LOOP] }] }]],
   },
+  shape('mode-single', 'CPU0_A1'),
+  shape('mode-row', 'CPU0_D1'),
+  shape('mode-column', 'CPU0_B1'),
+  shape('mode-bank', 'CPU0_E1'),
+  {
+    // A repair that held and one that did not: the card of each CXL device.
+    name: 'repair', dir: 'testdata/real', cols: 80, size: 'auto',
+    panes: [
+      [{ runs: [{ argv: ['my', 'dimm', '--root', REPAIR, 'cxl:mem1'], keep: each(before(/안에서 오류가 몰린/), before(/^ where the errors sit/)) }] }],
+      [{ runs: [{ argv: ['my', 'dimm', '--root', REPAIR, 'cxl:mem0'], keep: each(before(/안에서 오류가 몰린/), before(/^ where the errors sit/)) }] }],
+    ],
+  },
 ];
 
 // The report: the first screen of the HTML file, at 1280 x 800 CSS pixels. The case is the copy of
@@ -101,6 +133,13 @@ const REPORT = {
 // Blocks of text on the page. The quick start runs `my` from the top of the
 // repository, as a reader does after the install script and `git clone`.
 const BLOCKS = [
+  // The hero: which DIMM, what shape, what to do, in as few columns as the
+  // table takes.
+  // The legend of the slot map is left out: the table names the grade of
+  // each DIMM in the colour of its slot.
+  { name: 'hero', dir: 'testdata/real', cols: each(52, 53), cls: 'term-hero', label: each('my 실행 결과: 슬롯 맵과 DIMM 표', 'Output of my: slot map and DIMM table'),
+    runs: [{ argv: ['my', '--root', MULTI], from: /^(호스트 소견|host finding)/, drop: /^ [▓▒░█]{2} |^ \d+ slots?, \d+ DIMMs?$/,
+      keep: each(before(/^ 오류 없는 DIMM/), before(/^ \d+ DIMMs? without errors/)) }] },
   { name: 'lab-verify', dir: 'testdata/real', cols: 80, label: each('my verify 실행 결과', 'Output of my verify'),
     runs: [{ argv: ['my', 'verify', '--root', MULTI, '--expect', `${MULTI}/plan.yaml`] }] },
   // In English the table keeps its trend column from 84 columns on, as the Korean one does at 76.
@@ -172,6 +211,7 @@ try {
     const out = join(work, lang);
     mkdirSync(out);
     const sizes = { [REPORT.name]: [1600, 1000] };
+    const inline = new Set(FIGURES.filter((f) => f.inline).map((f) => f.name));
 
     // Runs one command in a terminal of `cols` columns; returns its lines.
     const run = (dir, cols, r) => {
@@ -185,6 +225,18 @@ try {
       let lines = text.replace(/\n+$/, '').split('\n');
       const keep = typeof r.keep === 'function' ? r.keep : r.keep?.[lang];
       if (keep) lines = lines.slice(0, keep(lines.map(plain)));
+      if (r.from) {
+        const a = lines.map(plain).findIndex((l) => r.from.test(l));
+        if (a < 0) throw new Error(`${prompt(r)} (${lang}): no line matches ${r.from}`);
+        lines = lines.slice(a);
+      }
+      if (r.crop) {
+        const [a, b] = r.crop(lines.map(plain));
+        lines = lines.slice(a, b);
+      }
+      if (r.drop) lines = lines.filter((l) => !r.drop.test(plain(l)));
+      // Leaving lines out may put two empty lines together: one is enough.
+      lines = lines.filter((l, i) => plain(l).trim() !== '' || i === 0 || plain(lines[i - 1]).trim() !== '');
       while (lines.length && plain(lines[lines.length - 1]).trim() === '') lines.pop();
       return lines;
     };
@@ -193,7 +245,7 @@ try {
     const pane = (dir, cols, p) => {
       const rows = [];
       for (const r of p.runs) {
-        rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
+        if (p.prompt !== false) rows.push(`<span class="ps">$ </span>${esc(prompt(r))}`);
         for (const line of run(dir, cols, r)) rows.push(...wrap(cells(line), cols).map(html));
       }
       return rows;
@@ -232,12 +284,16 @@ try {
       const open = `<!-- run:${b.name} -->`, close = `<!-- /run:${b.name} -->`;
       const a = index.indexOf(open), z = index.indexOf(close);
       if (a < 0 || z < a) throw new Error(`${file} has no ${open} ... ${close}`);
-      const block = `<pre class="term term-out" tabindex="0" role="region" aria-label="${b.label[lang]}" style="--cols:${cols}"><code>${rows.join('\n')}</code></pre>`;
+      const block = `<pre class="term term-out${b.cls ? ' ' + b.cls : ''}" tabindex="0" role="region" aria-label="${b.label[lang]}" style="--cols:${cols}"><code>${rows.join('\n')}</code></pre>`;
       index = index.slice(0, a + open.length) + block + index.slice(z);
     }
 
     // Each figure shows the image of its language, and its frame takes the shape of that image.
     for (const [name, [w, h]] of Object.entries(sizes)) {
+      if (inline.has(name)) {
+        if (!index.includes(`/captures/${lang}/${name}.webp`)) throw new Error(`${file} does not show captures/${lang}/${name}.webp`);
+        continue;
+      }
       const at = index.indexOf(`data-capture="${name}"`);
       const end = index.indexOf('</figure>', at);
       if (at < 0 || end < 0) throw new Error(`${file} has no figure data-capture="${name}"`);
@@ -380,8 +436,8 @@ html,body{margin:0;width:100vw;height:100vh;overflow:hidden;background:#16181D}
 pre{width:calc(var(--cols) * 1ch)}
 pre + pre{border-left:1px solid #2B2F38;margin-left:1.6ch;padding-left:1.6ch}
 </style>
-<div class="bar"><i></i><i></i><i></i><span>${esc(title)}</span></div>
-<div class="area"><div class="grid term">${grid}</div></div>
+${f.bar === false ? '' : `<div class="bar"><i></i><i></i><i></i><span>${esc(title)}</span></div>`}
+<div class="area"${f.bar === false ? ' style="inset:0;display:flex;align-items:center;justify-content:center"' : ''}><div class="grid term">${grid}</div></div>
 <script>${TERM_JS}
 document.fonts.ready.then(() => {
   koSpacing(document.querySelector('.grid'));
