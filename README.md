@@ -32,24 +32,35 @@ The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `tr
 
 ## Captures
 
-Each figure on the page has a framed slot that shows a gray skeleton until a screenshot exists. To fill a slot, save the screenshot under the name in the table and commit it. No HTML change is needed.
-
-| Figure | File |
-| --- | --- |
-| Slot map | `site/captures/slot-map.webp` |
-| Topology bars | `site/captures/topology-bars.webp` |
-| Address map | `site/captures/address-map.webp` |
-| Timeline | `site/captures/timeline.webp` |
-| Verdict card | `site/captures/verdict-card.webp` |
-| Report | `site/captures/report.webp` |
-
-Format: WebP, 1600 x 1000 px (16:10). The widest slot is about 640 CSS px, so 1600 px covers 2x screens. An image with another ratio is fitted inside the frame without cropping.
+Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the two text blocks (the `my verify` run in the lab section and the first screen of the quick start). One command makes all of them:
 
 ```
-cwebp -q 82 -resize 1600 0 shot.png -o site/captures/slot-map.webp
+node tools/captures.mjs --repo ../my
 ```
 
-The slot name is the `data-capture` attribute in `site/index.html`. Until a file exists the browser logs one 404 per empty slot. The server caches images for one hour, so a replaced file can take that long to show.
+The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`. Every command runs in a pseudo-terminal of a fixed width with a Korean locale (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed; a figure may leave out whole lines (`keep` of a run in the script). Then the script
+
+- renders each figure with Chrome and writes `site/captures/<name>.webp`, 1600 px wide;
+- writes the width and height of each image into its `<figure>` in `site/index.html`, and the ratio of the frame when it is not 16:10;
+- replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/index.html`;
+- writes nothing when an output holds a path of the machine it ran on.
+
+`--shots DIR` keeps the PNG of each figure and the raw output of each run. It needs git, make, Go, python3, cwebp and Chrome (`CHROME` if Chrome is not in the default macOS location).
+
+| Figure | File | Commands, in `testdata/real` unless named |
+| --- | --- | --- |
+| Slot map | `slot-map.webp` | `my scan --root 6.19.10-ghes-multi` |
+| Topology bars | `dimm.webp` | `my dimm --root 6.19.10-ghes-multi CPU0_B1` |
+| Address map | `address-map.webp` | `my map --root 6.19.10-ghes-multi` for CPU0_A1, CPU0_D1, CPU0_B1 and CPU0_E1 |
+| Same cell | `boots-same.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db boots 'DIMM 0'` |
+| Another DIMM each boot | `boots-spread.webp` | in `6.19.10-ghes-loop-spread`: `my open var/lib/my/ledger.db boots`, then `... why --oneline \| tail -n 1` |
+| Verdict card | `verdict-card.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db why 'DIMM 0'` |
+| Preflight | `preflight.webp` | `my preflight --root 6.19.10-bert-loop` |
+| Report | `report.webp` | `my import 6.19.10-ghes-multi 6.19.10-ghes-multi/journal-all.json`, then `my report` of that bundle |
+
+Until an image loads, its frame shows a gray skeleton. The server caches images for one hour, so a replaced file can take that long to show.
+
+The text blocks keep the colours of the run as classes (`b` bold, `d` dim, `c31` to `c36` for the colours). A terminal column is one `ch` of Geist Mono. Box and block characters come from a subset of JetBrains Mono that has the same advance. Hangul comes from the reader's system font (`Term Ko` in `site/css/site.css`, `size-adjust: 118%`); `site/js/site.js` measures it and spaces each character to two columns. The figure pages of `tools/captures.mjs` use the same fonts and the same measurement.
 
 ## Share image and icons
 
@@ -61,7 +72,15 @@ This renders `tools/og.svg` to `site/og.png` (1200 x 630) and `site/favicon.svg`
 
 ## Fonts
 
-SUIT Variable 2.040 and Geist Mono 1.400, both under the SIL Open Font License 1.1. The license texts are next to the files in `site/fonts/`.
+SUIT Variable 2.040, Geist Mono 1.400 and a subset of JetBrains Mono 2.304, all under the SIL Open Font License 1.1. The license texts are next to the files in `site/fonts/`.
+
+The JetBrains Mono file holds the 160 characters of U+2500 to U+259F (box drawing and block elements), which Geist Mono lacks. It was cut from `JetBrainsMono-Regular.ttf` of the release archive `JetBrainsMono-2.304.zip` with fontTools 4.68:
+
+```
+pyftsubset JetBrainsMono-Regular.ttf --unicodes=U+2500-259F --flavor=woff2 \
+  --layout-features='' --no-hinting --desubroutinize --name-IDs='*' \
+  --output-file=JetBrainsMono-Blocks-2.304.woff2
+```
 
 The server caches `/fonts/` as immutable. The file names carry the font version for that reason: a changed font file needs a new name and a matching edit in `site/css/site.css` and the preload link in `site/index.html`.
 
