@@ -15,6 +15,30 @@
   font-display: swap;
 }
 
+/* 터미널 블록의 상자 문자와 블록 문자. Geist Mono 에 없는 글자만 담은 JetBrains Mono 2.304 의 부분 집합이다.
+   폭이 Geist Mono 와 같아(0.6em) 한 칸에 꼭 맞는다. */
+@font-face {
+  font-family: "Term Blocks";
+  src: url(/fonts/JetBrainsMono-Blocks-2.304.woff2) format("woff2");
+  unicode-range: U+2500-259F;
+  font-display: swap;
+}
+/* 터미널 블록의 한글. 읽는 사람의 시스템 한글 글꼴을 조금 키워 두 칸을 더 채운다. 남는 폭은 site.js 가 잰다. */
+@font-face {
+  font-family: "Term Ko";
+  font-weight: 400;
+  size-adjust: 118%;
+  unicode-range: U+1100-11FF, U+3130-318F, U+AC00-D7A3;
+  src: local("AppleSDGothicNeo-Regular"), local("Apple SD Gothic Neo"), local("NotoSansKR-Regular"), local("Noto Sans KR"), local("NotoSansCJKkr-Regular"), local("Malgun Gothic");
+}
+@font-face {
+  font-family: "Term Ko";
+  font-weight: 700;
+  size-adjust: 118%;
+  unicode-range: U+1100-11FF, U+3130-318F, U+AC00-D7A3;
+  src: local("AppleSDGothicNeo-Bold"), local("NotoSansKR-Bold"), local("NotoSansCJKkr-Bold"), local("Malgun Gothic Bold");
+}
+
 /* 인트로 로고가 접히고 .sh 가 붙는 정도. 숫자로 등록해 두어야 중간값을 보간한다. */
 @property --fold { syntax: "<number>"; inherits: true; initial-value: 0; }
 @property --ext { syntax: "<number>"; inherits: true; initial-value: 0; }
@@ -33,6 +57,7 @@
 
   --font: "SUIT Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
   --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --term: "Term Blocks", "Geist Mono", "Term Ko", ui-monospace, SFMono-Regular, Menlo, Consolas, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", monospace;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
@@ -587,12 +612,12 @@ html[data-intro="settle"] .hero-art .cell {
   gap: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 3vw, 2.5rem);
 }
 .fig { container-type: inline-size; min-width: 0; }
-.fig-wide { grid-column: 1 / -1; }
+.fig-wide, .fig-full { grid-column: 1 / -1; }
 
 .capture { display: grid; gap: 1.125rem; }
 .capture-frame {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: var(--ar, 16 / 10);
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #FBFBFC;
@@ -695,13 +720,21 @@ html[data-intro="settle"] .hero-art .cell {
   white-space: nowrap;
 }
 
-/* 칸이 넓으면 그림과 글을 나란히 둔다 */
+/* 칸이 넓으면 그림과 글을 나란히 둔다. 주소 맵은 그림을 칸 폭 그대로 두고 글을 아래에 나란히 둔다. */
 @container (min-width: 44rem) {
   .capture {
     grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
     align-items: center;
     gap: clamp(1.5rem, 4cqi, 3.5rem);
   }
+  .fig-full .capture { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .fig-full figcaption {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: clamp(1.5rem, 4cqi, 3.5rem);
+    align-items: start;
+  }
+  .fig-full .fig-key { margin-top: 0; }
 }
 
 /* ---- 빠른 시작 ---- */
@@ -723,6 +756,60 @@ html[data-intro="settle"] .hero-art .cell {
 .term .ps { color: #8B909C; user-select: none; }
 .term .cm { color: #8B909C; }
 .term-one { font-size: clamp(1.125rem, 3.4vw, 1.5rem); font-weight: 560; }
+
+/* 실제 실행의 출력. --cols 칸의 터미널 폭을 그대로 두고, 화면이 좁으면 가로로 스크롤한다.
+   색은 실행이 낸 SGR 코드를 따른다(b 굵게, d 흐리게, c31~c36 글자색). */
+.term-out {
+  --pad: clamp(0.875rem, 2.4vw, 1.25rem);
+  width: calc(var(--cols, 80) * 1ch + 2 * var(--pad) + 0.75rem);
+  scrollbar-width: thin;
+  max-width: 100%;
+  max-height: min(36rem, 85svh);
+  overflow: auto;
+  padding: var(--pad);
+  font-family: var(--term);
+  font-size: 0.75rem;
+  line-height: 1.42;
+  color: #E6E8EC;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+  scrollbar-color: #4A4F5A transparent;
+}
+.term-out code { font: inherit; overflow-wrap: normal; word-break: normal; }
+.term-out:focus-visible { outline-offset: 2px; }
+.term-out ::selection { background: rgb(245 128 37 / 0.4); color: #fff; }
+.term-out .ps { color: var(--orange); }
+.term-out .w {
+  letter-spacing: var(--kls, 0.16em);
+  margin-inline: calc(var(--kls, 0.16em) / 2) calc(var(--kls, 0.16em) / -2);
+}
+.term-out .b { font-weight: 700; }
+.term-out .b .w {
+  letter-spacing: var(--klsb, 0.16em);
+  margin-inline: calc(var(--klsb, 0.16em) / 2) calc(var(--klsb, 0.16em) / -2);
+}
+.term-out .d { opacity: 0.55; }
+.term-out .c31 { color: #FF6B6E; }
+.term-out .c32 { color: #5FD38A; }
+.term-out .c33 { color: #F5A35C; }
+.term-out .c35 { color: #D98CF0; }
+.term-out .c36 { color: #5FC8D9; }
+@media (min-width: 60rem) { .term-out { font-size: 0.8125rem; } }
+
+/* ---- 검증: 그림에 쓴 캡처 ---- */
+.caps { margin-top: 1rem; border-top: 1px solid var(--line); }
+.caps > div {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 0.25rem 1.5rem;
+  padding-block: 0.875rem;
+  border-bottom: 1px solid var(--line);
+}
+.caps dt code { font-size: 0.875rem; font-weight: 520; }
+.caps dd { margin: 0; }
+.sec-body > .caps + p, .sec-body > .gaps + p { margin-top: 1.75rem; }
+.sec-body > p + .caps { margin-top: 1rem; }
 
 /* ---- 없는 주소 ---- */
 .lost { min-height: calc(100svh - var(--banner-h)); display: grid; align-items: center; padding-block: 4rem; }
@@ -803,6 +890,7 @@ html[data-intro="settle"] .hero-art .cell {
   .nav a:not(.nav-gh) { display: none; }
   .figs { grid-template-columns: minmax(0, 1fr); }
   .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 0.75rem; }
+  .caps > div { grid-template-columns: minmax(0, 1fr); }
 }
 @container (min-width: 44rem) {
   .shapes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
