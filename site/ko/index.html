@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MemorY, 읽기 전용 메모리 오류 분석 도구</title>
-<meta name="description" content="MemorY는 서버의 메모리 오류 기록을 읽어 DIMM 어디에 어떤 모양의 고장이 있는지 그림으로 보여주는 읽기 전용 오픈소스 도구입니다. 개발 중입니다.">
+<meta name="description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구이며 지금 개발 중입니다.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/ko/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:url" content="https://my.sh/ko/">
 <meta property="og:title" content="MemorY, 읽기 전용 메모리 오류 분석 도구">
-<meta property="og:description" content="서버의 메모리 오류 기록을 읽어 DIMM 어디에 어떤 모양의 고장이 있는지 그림으로 보여주는 읽기 전용 오픈소스 도구입니다. 개발 중입니다.">
+<meta property="og:description" content="MemorY는 서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다. 읽기 전용 오픈소스 도구이며 지금 개발 중입니다.">
 <meta property="og:image" content="https://my.sh/og.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=6abefc5d">
+<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
 <script src="/js/site.js?v=58662300"></script>
 </head>
 <body>
@@ -55,14 +55,15 @@
     <a class="brand" href="/" aria-label="MemorY 첫 화면">
       <span class="mark mark-loop"><span class="mark-size" aria-hidden="true"><b>M</b>emor<b>Y</b></span><span class="mark-live" aria-hidden="true"><span class="mk-m">M</span><span class="mk-track"><span class="mk-mid"><span class="mk-l" data-c="e">e</span><span class="mk-l" data-c="m">m</span><span class="mk-l" data-c="o">o</span><span class="mk-l" data-c="r">r</span></span><span class="mk-slide"><span class="mk-tail"><span class="mk-y">Y</span><span class="mk-ext"><span class="mk-x">.</span><span class="mk-x">s</span><span class="mk-x">h</span></span></span></span></span></span></span>
     </a>
-    <nav class="nav" aria-label="주요 메뉴">
-      <a href="#what">소개</a>
-      <a href="#figures">그림</a>
-      <a href="#lab">검증</a>
-      <a href="#start">빠른 시작</a>
+    <nav class="nav menu" aria-label="주요 메뉴">
+      <a href="/ko/" aria-current="page">소개</a>
+      <a href="/ko/download/">다운로드</a>
+      <a href="https://linux.io/">블로그</a>
+    </nav>
+    <div class="nav tools">
       <span class="lang" role="group" aria-label="언어"><a href="/?lang=ko" lang="ko" hreflang="ko" aria-current="true">한국어</a><span class="lang-bar" aria-hidden="true">|</span><a href="/?lang=en" lang="en" hreflang="en">English</a></span>
       <a class="nav-gh" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub</a>
-    </nav>
+    </div>
   </div>
 </header>
 
@@ -73,7 +74,7 @@
     <div class="hero-copy">
       <h1 class="hero-title" id="hero-title" data-enter style="--e:0"><span class="wm"><b>M</b>emor<b>Y</b></span></h1>
       <p class="slogan" data-enter style="--e:1"><span>Memory의 <b>M</b>부터 <b>Y</b>까지</span><span>모든 것을 책임지는 솔루션</span></p>
-      <p class="lede" data-enter style="--e:2">서버의 메모리 오류 기록을 읽어, DIMM 어디에 어떤 모양의 고장이 있는지 그림으로 보여주는 읽기 전용 오픈소스 도구입니다.</p>
+      <p class="lede lines" data-enter style="--e:2"><span>서버에 남은 메모리 오류 기록을 읽고, 고장이 DIMM 어디에서 어떤 모양으로 났는지 그림으로 보여 줍니다.</span><span>읽기 전용 오픈소스 도구입니다.</span></p>
       <div class="hero-actions" data-enter style="--e:3">
         <a class="btn" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub <span class="mono">agenticode/my</span></a>
         <a class="link" href="#start">빠른 시작</a>
@@ -104,8 +105,8 @@
     <p class="sec-tag">소개</p>
     <div class="sec-body">
       <h2 id="what-h">기록을 읽기만 합니다</h2>
-      <p>MemorY는 Linux 서버가 이미 남긴 메모리 오류 기록을 읽습니다. 페이지 offline, 리페어, 카운터 초기화 같은 조치는 하지 않습니다.</p>
-      <p>읽은 기록은 DIMM 시리얼 번호를 기준으로 원장 하나에 모읍니다. 재부팅해도 이력이 남고, DIMM을 다른 슬롯으로 옮겨도 이력이 따라갑니다.</p>
+      <p class="lines"><span>MemorY는 Linux 서버에 이미 남아 있는 메모리 오류 기록을 읽습니다.</span><span>페이지 offline, 리페어, 카운터 초기화는 하지 않습니다.</span></p>
+      <p class="lines"><span>읽은 기록은 DIMM 시리얼 번호별로 원장 하나에 모읍니다.</span><span>재부팅한 뒤에도 이력이 남습니다.</span><span>DIMM을 다른 슬롯으로 옮기면 이력도 같이 옮겨 갑니다.</span></p>
       <div class="inputs">
         <span class="inputs-key">입력</span>
         <code>rasdaemon DB</code>
@@ -127,13 +128,13 @@
   <div class="wrap sec-grid">
     <p class="sec-tag">문제</p>
     <div class="sec-body">
-      <h2 id="gap-h">메모리 오류 로그는 아직 사람이 손으로 읽습니다</h2>
+      <h2 id="gap-h">메모리 오류 로그는 아직 사람이 직접 읽습니다</h2>
       <ol class="gaps">
-        <li>로그 형식이 출처마다 다릅니다.</li>
-        <li>주소는 디바이스, 뱅크, row, column으로 직접 풀어야 합니다.</li>
-        <li>카운터는 재부팅하면 처음부터 다시 셉니다.</li>
-        <li>DIMM 문제인지 슬롯 문제인지는 짐작으로 정합니다.</li>
-        <li>보고서에 넣을 그림은 손으로 그립니다.</li>
+        <li>로그 형식이 소스마다 다릅니다.</li>
+        <li>물리 주소를 device, bank, row, column으로 직접 디코딩해야 합니다.</li>
+        <li>EDAC 카운터는 재부팅하면 처음부터 다시 셉니다.</li>
+        <li>DIMM 문제인지 슬롯 문제인지는 짐작으로 판단합니다.</li>
+        <li>보고서에 넣을 그림은 직접 그립니다.</li>
       </ol>
     </div>
   </div>
@@ -144,9 +145,9 @@
     <div class="sec-grid">
       <p class="sec-tag">그림</p>
       <div class="sec-body">
-        <h2 id="figures-h">그림으로 보여줍니다</h2>
-        <p class="sec-lead">그림마다 답하는 질문이 하나씩 있습니다. 아래 화면은 저장소의 <code>testdata/real</code>에 있는 랩 캡처를 MemorY로 읽은 출력입니다. <code>tools/captures.mjs</code>가 터미널에서 명령을 돌려 그대로 찍고, 그림에 따라 줄 단위로만 잘랐습니다.</p>
-        <p class="sec-lead">앞의 세 그림은 DIMM&nbsp;6개를 단 aarch64 게스트입니다. 하루 간격으로 세 번 부팅하면서 펌웨어 오류 레코드로 CE&nbsp;35건과 UE&nbsp;1건을 넣었습니다. DIMM&nbsp;4개에 셀 하나, row, column, bank 고장을 하나씩 넣었고 2개는 비워 두었습니다. 그다음 두 그림은 치명적 오류로 부팅이 거듭 멈춘 게스트 둘입니다.</p>
+        <h2 id="figures-h">그림으로 보여 줍니다</h2>
+        <p class="sec-lead lines"><span>아래 화면은 모두 MemorY를 실제로 실행한 출력입니다.</span><span>입력은 저장소 <code>testdata/real</code>에 있는 랩 캡처입니다.</span><span><code>tools/captures.mjs</code>가 터미널에서 명령을 실행하고 화면을 그대로 찍었습니다.</span><span>그림에 따라 출력 일부를 줄 단위로 잘랐습니다.</span></p>
+        <p class="sec-lead lines"><span>처음 세 그림의 입력은 DIMM&nbsp;6개짜리 aarch64 게스트입니다.</span><span>하루 간격으로 세 번 부팅하며 펌웨어 오류 레코드로 CE&nbsp;35건, UE&nbsp;1건을 주입했습니다.</span><span>DIMM&nbsp;4개에는 셀, row, column, bank 고장을 하나씩 넣었습니다.</span><span>나머지 DIMM&nbsp;2개에는 오류가 없습니다.</span><span>다음 두 그림은 치명적 오류로 부팅이 계속 멈춘 게스트 두 대의 기록입니다.</span></p>
       </div>
     </div>
 
@@ -155,13 +156,13 @@
         <figure class="capture" data-capture="slot-map">
           <div class="capture-frame">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s1" x="16" y="15" width="52" height="3.5" rx="1"/><rect class="s1" x="16" y="34.5" width="12" height="4" rx="1"/><rect class="s1" x="36" y="30" width="10" height="13" rx="1.6"/><rect class="s2" x="49.6" y="30" width="10" height="13" rx="1.6"/><rect class="s1" x="63.2" y="30" width="10" height="13" rx="1.6"/><rect class="s2" x="76.8" y="30" width="10" height="13" rx="1.6"/><rect class="s2" x="90.4" y="30" width="10" height="13" rx="1.6"/><rect class="s1" x="104" y="30" width="10" height="13" rx="1.6"/><rect class="s1" x="16" y="56" width="128" height="3" rx="1"/><rect class="s1" x="16" y="63" width="120" height="3" rx="1"/><rect class="s1" x="16" y="70" width="124" height="3" rx="1"/><rect class="s1" x="16" y="77" width="104" height="3" rx="1"/></svg>
-            <img src="/captures/ko/slot-map.webp" alt="my scan --root 6.19.10-ghes-multi 화면. 호스트 lab-arm6의 소견은 교체 고려입니다. CPU0 슬롯 6개 가운데 B1, D1, E1은 교체 고려, A1은 관찰, C1과 F1은 정상입니다. 표에는 DIMM 4개의 CE, UE, 고장 모드가 있습니다." width="1600" height="1000" loading="lazy" decoding="async">
+            <img src="/captures/ko/slot-map.webp" alt="my scan --root 6.19.10-ghes-multi 실행 화면. 호스트 lab-arm6의 소견은 교체 고려입니다. CPU0 슬롯 6개 중 B1, D1, E1은 교체 고려, A1은 관찰, C1과 F1은 정상입니다. 표에는 DIMM 4개의 CE 수, UE 수, 고장 모드가 있습니다." width="1600" height="1000" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>슬롯 맵</h3>
-            <p class="fig-q">어느 DIMM인가</p>
-            <p class="fig-d">메인보드의 소켓과 채널 배치대로 슬롯을 그리고, 오류가 있는 DIMM을 위험 순위대로 적습니다.</p>
+            <p class="fig-q">어느 DIMM이 문제인가</p>
+            <p class="fig-d lines"><span>슬롯을 메인보드의 소켓과 채널 배치대로 그립니다.</span><span>오류가 난 DIMM은 위험도 순으로 표에 적습니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -170,13 +171,13 @@
         <figure class="capture" data-capture="dimm">
           <div class="capture-frame">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s2" x="16" y="14" width="22" height="4" rx="1"/><rect class="s1" x="42" y="14" width="96" height="4" rx="1"/><rect class="s1" x="60" y="22" width="78" height="4" rx="1"/><rect class="s1" x="22" y="36" width="110" height="3" rx="1"/><rect class="s1" x="22" y="43" width="80" height="3" rx="1"/><rect class="s1" x="22" y="50" width="96" height="3" rx="1"/><rect class="s1" x="16" y="64" width="104" height="3" rx="1"/><rect class="s2" x="16" y="72" width="22" height="7" rx="1"/><rect class="s2" x="40" y="72" width="14" height="7" rx="1"/><rect class="s2" x="56" y="72" width="18" height="7" rx="1"/><rect class="s2" x="76" y="72" width="14" height="7" rx="1"/><rect class="s1" x="92" y="72" width="52" height="7" rx="1"/></svg>
-            <img src="/captures/ko/dimm.webp" alt="my dimm --root 6.19.10-ghes-multi CPU0_B1 화면. 교체 고려, 규칙 R-ROW-03, rank1 dev5 bg0 bank3 col 0x1c8의 column 고장입니다. 그 아래 막대는 이 bank 안의 오류가 row 9개로 나뉘는 비중을 보여줍니다." width="1600" height="1000" loading="lazy" decoding="async">
+            <img src="/captures/ko/dimm.webp" alt="my dimm --root 6.19.10-ghes-multi CPU0_B1 실행 화면. 판정은 교체 고려, 규칙은 R-ROW-03입니다. 고장은 rank1 dev5 bg0 bank3 col 0x1c8의 column 고장입니다. 아래 막대는 이 bank 안의 오류를 row별로 나눈 비중이고, row는 9개입니다." width="1600" height="1000" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>토폴로지 막대</h3>
             <p class="fig-q">오류가 어디에 몰렸나</p>
-            <p class="fig-d">판정 카드 아래에 오류가 모인 rank, device, bank를 적고, 그 안에서 갈라지는 row를 막대로 그립니다. 막대의 폭이 오류 비중입니다.</p>
+            <p class="fig-d lines"><span>판정 카드 아래에 오류가 몰린 rank, device, bank를 적습니다.</span><span>그 아래 막대는 row별로 칸이 나뉩니다.</span><span>칸 폭은 이 DIMM의 오류 중 그 row가 차지하는 비중입니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -185,17 +186,17 @@
         <figure class="capture" data-capture="address-map">
           <div class="capture-frame" style="--ar:1600 / 1260">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect x="18" y="12" width="126" height="78" fill="url(#dots6)"/><rect class="s2" x="18.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="30.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="36.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="54.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="66.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="78.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="84.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="102.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s2" x="120.6" y="48.6" width="4.8" height="4.8" rx="1"/><rect class="s1" x="36.6" y="54.6" width="4.8" height="4.8" rx="1"/><rect class="s1" x="102.6" y="54.6" width="4.8" height="4.8" rx="1"/></svg>
-            <img src="/captures/ko/address-map.webp" alt="my map 화면 넷. 왼쪽 위 CPU0_A1은 row 0x4d2e의 칸 하나, 오른쪽 위 CPU0_D1은 row 0x2b41을 따라 가로로 늘어선 칸과 UE 하나, 왼쪽 아래 CPU0_B1은 column 0x1c8을 따라 세로로 늘어선 칸, 오른쪽 아래 CPU0_E1은 bank 곳곳에 흩어진 칸입니다." width="1600" height="1260" loading="lazy" decoding="async">
+            <img src="/captures/ko/address-map.webp" alt="my map 실행 화면 4개. 왼쪽 위 CPU0_A1은 row 0x4d2e의 칸 하나입니다. 오른쪽 위 CPU0_D1은 row 0x2b41을 따라 가로로 늘어선 칸과 UE 하나입니다. 왼쪽 아래 CPU0_B1은 column 0x1c8을 따라 세로로 늘어선 칸입니다. 오른쪽 아래 CPU0_E1은 bank 곳곳에 흩어진 칸입니다." width="1600" height="1260" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <div class="fig-text">
               <h3>주소 맵</h3>
               <p class="fig-q">어떤 모양의 고장인가</p>
-              <p class="fig-d">뱅크 하나를 row와 column 격자로 펼칩니다. 위 화면 넷은 고장을 하나씩 넣은 DIMM&nbsp;4개입니다.</p>
+              <p class="fig-d lines"><span>bank 하나를 row와 column 격자로 펼쳐 그립니다.</span><span>위 화면 4개는 고장을 하나씩 넣은 DIMM&nbsp;4개입니다.</span></p>
             </div>
             <div class="fig-legend">
-              <p class="fig-key">고장 모드는 모양으로 읽습니다.</p>
+              <p class="fig-key">고장 모드는 모양으로 구분합니다.</p>
               <ul class="shapes">
                 <li><svg viewBox="0 0 72 56" aria-hidden="true" focusable="false"><rect width="72" height="56" fill="url(#dots8)"/><rect class="c3" x="33.5" y="25.5" width="5" height="5" rx="1.2"/></svg><span class="shape-name">점</span><code>single bit</code></li>
                 <li><svg viewBox="0 0 72 56" aria-hidden="true" focusable="false"><rect width="72" height="56" fill="url(#dots8)"/><rect class="c2" x="1.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c3" x="9.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c2" x="25.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c3" x="33.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c1" x="41.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c3" x="57.5" y="25.5" width="5" height="5" rx="1.2"/><rect class="c2" x="65.5" y="25.5" width="5" height="5" rx="1.2"/></svg><span class="shape-name">가로줄</span><code>row</code></li>
@@ -211,13 +212,13 @@
         <figure class="capture" data-capture="boots-same">
           <div class="capture-frame">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s1" x="16" y="16" width="70" height="4" rx="1"/><rect class="s1" x="16" y="32" width="36" height="3" rx="1"/><rect class="s1" x="62" y="32" width="6" height="3" rx="1"/><rect class="s1" x="74" y="32" width="6" height="3" rx="1"/><rect class="s1" x="86" y="32" width="6" height="3" rx="1"/><rect class="s1" x="98" y="32" width="6" height="3" rx="1"/><rect class="s1" x="16" y="44" width="40" height="3" rx="1"/><rect class="s2" x="62" y="43" width="6" height="5" rx="1"/><rect class="s2" x="74" y="43" width="6" height="5" rx="1"/><rect class="s2" x="86" y="43" width="6" height="5" rx="1"/><rect class="s1" x="99" y="44" width="4" height="3" rx="1"/><rect class="s1" x="16" y="62" width="112" height="3" rx="1"/><rect class="s1" x="16" y="76" width="120" height="3" rx="1"/><rect class="s1" x="16" y="83" width="64" height="3" rx="1"/></svg>
-            <img src="/captures/ko/boots-same.webp" alt="my open var/lib/my/ledger.db boots 'DIMM 0' 화면. 부팅 1, 2, 3은 치명적 하드웨어 오류로 끝났고, 세 번 모두 DIMM 0의 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에 UE가 있습니다. 부팅 4는 실행 중입니다. 규칙은 R-LOOP-01입니다." width="1600" height="1000" loading="lazy" decoding="async">
+            <img src="/captures/ko/boots-same.webp" alt="my open var/lib/my/ledger.db boots 'DIMM 0' 실행 화면. 부팅 1, 2, 3은 치명적 하드웨어 오류로 끝났습니다. 세 번 모두 DIMM 0의 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE가 났습니다. 부팅 4는 실행 중입니다. 규칙은 R-LOOP-01입니다." width="1600" height="1000" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>같은 셀에서 멈춘 부팅</h3>
-            <p class="fig-q">부팅이 거듭 멈추는 원인이 DIMM인가</p>
-            <p class="fig-d">x86 게스트의 보관 원장입니다. 부팅 4회 중 3회가 DIMM&nbsp;0의 같은 셀에서 난 UE로 끝났고, <span class="nowrap">R-LOOP-01이</span> 이 DIMM을 가리킵니다.</p>
+            <p class="fig-q">부팅이 계속 멈추는 원인이 DIMM인가</p>
+            <p class="fig-d lines"><span>x86 게스트에서 <code>my harvest</code>가 부팅마다 채운 보관 원장입니다.</span><span>부팅 4번 중 3번이 DIMM&nbsp;0의 같은 셀에서 난 UE로 끝났습니다.</span><span><span class="nowrap">R-LOOP-01은</span> 이 DIMM을 원인으로 판정합니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -226,13 +227,13 @@
         <figure class="capture" data-capture="boots-spread">
           <div class="capture-frame">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s1" x="16" y="14" width="84" height="4" rx="1"/><rect class="s1" x="16" y="30" width="30" height="3" rx="1"/><rect class="s1" x="16" y="38" width="30" height="3" rx="1"/><rect class="s1" x="16" y="46" width="30" height="3" rx="1"/><rect class="s2" x="62" y="29" width="6" height="5" rx="1"/><rect class="s1" x="75" y="30" width="4" height="3" rx="1"/><rect class="s1" x="87" y="30" width="4" height="3" rx="1"/><rect class="s1" x="63" y="38" width="4" height="3" rx="1"/><rect class="s2" x="74" y="37" width="6" height="5" rx="1"/><rect class="s1" x="87" y="38" width="4" height="3" rx="1"/><rect class="s1" x="63" y="46" width="4" height="3" rx="1"/><rect class="s1" x="75" y="46" width="4" height="3" rx="1"/><rect class="s2" x="86" y="45" width="6" height="5" rx="1"/><rect class="s1" x="16" y="64" width="124" height="3" rx="1"/><rect class="s1" x="16" y="71" width="120" height="3" rx="1"/><rect class="s1" x="16" y="78" width="96" height="3" rx="1"/></svg>
-            <img src="/captures/ko/boots-spread.webp" alt="my open var/lib/my/ledger.db boots 화면과 my why --oneline의 호스트 줄. 부팅 2, 3, 4가 중단됐고 UE는 차례로 CPU0_A1, CPU0_C1, CPU0_E1에 있습니다. 호스트 소견은 교체 보류, 규칙 R-LOOP-03이고, 프로세서와 보드 로그, 전원 공급 장치, 첫 중단 전에 바뀐 것부터 점검하라고 적혀 있습니다." width="1600" height="1000" loading="lazy" decoding="async">
+            <img src="/captures/ko/boots-spread.webp" alt="my open var/lib/my/ledger.db boots 실행 화면과 my why --oneline의 호스트 줄. 부팅 2, 3, 4가 중단됐고, UE는 차례로 CPU0_A1, CPU0_C1, CPU0_E1에서 났습니다. 호스트 소견은 교체 보류, 규칙은 R-LOOP-03입니다. 프로세서와 보드 로그, 전원 공급 장치, 첫 중단 전에 바뀐 것부터 점검하라고 적혀 있습니다." width="1600" height="1000" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>부팅마다 다른 DIMM</h3>
-            <p class="fig-q">DIMM을 바꾸면 멈춤이 끝나나</p>
-            <p class="fig-d">DIMM&nbsp;6개를 단 aarch64 게스트가 부팅 3회를 연달아 치명적 오류로 멈췄고, 오류는 매번 다른 DIMM에 났습니다. <span class="nowrap">R-LOOP-03은</span> 교체를 보류하고 프로세서와 보드 로그부터 점검하라고 적습니다.</p>
+            <p class="fig-q">DIMM을 교체하면 멈춤이 끝나나</p>
+            <p class="fig-d lines"><span>DIMM&nbsp;6개짜리 aarch64 게스트가 세 번 연달아 치명적 오류로 멈췄습니다.</span><span>오류는 매번 다른 DIMM에서 났습니다.</span><span><span class="nowrap">R-LOOP-03은</span> DIMM 교체를 보류하고 프로세서와 보드 로그부터 점검하라고 권합니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -241,13 +242,13 @@
         <figure class="capture" data-capture="verdict-card">
           <div class="capture-frame" style="--ar:1600 / 724">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s2" x="16" y="18" width="16" height="5" rx="1"/><rect class="s2" x="36" y="18" width="20" height="5" rx="1"/><rect class="s1" x="60" y="18.5" width="84" height="4" rx="1"/><rect class="s1" x="36" y="28" width="70" height="3" rx="1"/><rect class="s1" x="20" y="44" width="10" height="3" rx="1"/><rect class="s1" x="36" y="44" width="104" height="3" rx="1"/><rect class="s1" x="36" y="51" width="92" height="3" rx="1"/><rect class="s1" x="36" y="58" width="100" height="3" rx="1"/><rect class="s1" x="20" y="68" width="10" height="3" rx="1"/><rect class="s1" x="36" y="68" width="84" height="3" rx="1"/><rect class="s1" x="20" y="78" width="96" height="3" rx="1"/></svg>
-            <img src="/captures/ko/verdict-card.webp" alt="my open var/lib/my/ledger.db why 'DIMM 0' 화면. DIMM 0은 즉시 교체, 규칙 R-UE-01입니다. 근거는 R-LOOP-01과 뒷받침 두 줄이고, 다음 할 일은 DIMM 교체와 보관 원장에서 만든 케이스 번들 첨부입니다. 신뢰도는 높음입니다." width="1600" height="724" loading="lazy" decoding="async">
+            <img src="/captures/ko/verdict-card.webp" alt="my open var/lib/my/ledger.db why 'DIMM 0' 실행 화면. DIMM 0의 판정은 즉시 교체, 규칙은 R-UE-01입니다. 근거는 R-LOOP-01과 뒷받침 두 줄입니다. 다음 할 일은 DIMM 교체와 케이스 번들 첨부입니다. 번들은 보관 원장에서 만들어 반품에 첨부합니다. 신뢰도는 높음입니다." width="1600" height="724" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>판정 카드</h3>
-            <p class="fig-q">어떻게 할 것인가</p>
-            <p class="fig-d"><code>my why</code>는 판정 한 줄, 근거 최대 세 가지, 다음 할 일, 확인하지 못한 점검과 빠진 데이터의 수를 적습니다. 근거가 된 기록과 반례는 <code>--detail</code>에 있습니다.</p>
+            <p class="fig-q">무엇을 해야 하나</p>
+            <p class="fig-d lines"><span><code>my why</code>는 판정 한 줄과 근거를 최대 3개까지 보여 줍니다.</span><span>다음 할 일, 확인하지 못한 점검 수, 빠진 데이터 수도 같이 적습니다.</span><span>근거가 된 기록과 반례는 <code>--detail</code>로 봅니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -256,13 +257,13 @@
         <figure class="capture" data-capture="preflight">
           <div class="capture-frame" style="--ar:1600 / 1200">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="s1" x="16" y="12" width="96" height="4" rx="1"/><rect class="s1" x="16" y="26" width="112" height="3" rx="1"/><rect class="s2" x="16" y="38" width="10" height="4" rx="1"/><rect class="s1" x="32" y="38.5" width="22" height="3" rx="1"/><rect class="s1" x="60" y="38.5" width="76" height="3" rx="1"/><rect class="s2" x="16" y="48" width="10" height="4" rx="1"/><rect class="s1" x="32" y="48.5" width="22" height="3" rx="1"/><rect class="s1" x="60" y="48.5" width="70" height="3" rx="1"/><rect class="s2" x="16" y="58" width="10" height="4" rx="1"/><rect class="s1" x="32" y="58.5" width="22" height="3" rx="1"/><rect class="s1" x="60" y="58.5" width="80" height="3" rx="1"/><rect class="s2" x="16" y="68" width="10" height="4" rx="1"/><rect class="s1" x="32" y="68.5" width="22" height="3" rx="1"/><rect class="s1" x="60" y="68.5" width="64" height="3" rx="1"/><rect class="s1" x="16" y="84" width="60" height="3" rx="1"/></svg>
-            <img src="/captures/ko/preflight.webp" alt="my preflight --root 6.19.10-bert-loop 화면. 치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 남는 것을 점검별로 적습니다. mce-bootlog, mce-print, bert, console은 남음, erst-mce는 없음, reset-kind는 참고이고, 실행 중인 호스트가 있어야 하는 점검 7개는 모름입니다. 기록을 잃는 점검은 없습니다." width="1600" height="1200" loading="lazy" decoding="async">
+            <img src="/captures/ko/preflight.webp" alt="my preflight --root 6.19.10-bert-loop 실행 화면. 치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 무엇이 남는지 점검별로 적습니다. mce-bootlog, mce-print, bert, console은 남음, erst-mce는 없음, reset-kind는 참고입니다. 실행 중인 호스트가 있어야 하는 점검 7개는 모름입니다. 기록을 잃는 점검은 없습니다." width="1600" height="1200" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>리셋 전 점검</h3>
             <p class="fig-q">치명적 오류 뒤에 무엇이 남나</p>
-            <p class="fig-d"><code>my preflight</code>는 치명적 메모리 오류 직후 호스트가 리셋되면 남는 기록과 잃는 기록을 점검마다 적습니다. 같은 셀에서 멈춘 그 x86 게스트의 사본입니다.</p>
+            <p class="fig-d lines"><span><code>my preflight</code>는 치명적 메모리 오류 직후 호스트가 리셋될 때 남는 기록과 사라지는 기록을 점검 항목별로 보여 줍니다.</span><span>입력은 같은 셀에서 부팅이 멈춘 x86 게스트의 사본입니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -271,12 +272,12 @@
         <figure class="capture" data-capture="report">
           <div class="capture-frame">
             <svg class="capture-skel" viewBox="0 0 160 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><rect class="o1" x="48" y="8" width="64" height="84" rx="3"/><rect class="s2" x="55" y="15" width="28" height="4" rx="1"/><rect class="s1" x="55" y="22" width="42" height="2.4" rx="1"/><rect class="s1" x="55" y="30" width="6.4" height="6" rx="1"/><rect class="s1" x="63.6" y="30" width="6.4" height="6" rx="1"/><rect class="s2" x="72.2" y="30" width="6.4" height="6" rx="1"/><rect class="s1" x="80.8" y="30" width="6.4" height="6" rx="1"/><rect class="s1" x="89.4" y="30" width="6.4" height="6" rx="1"/><rect class="s1" x="98" y="30" width="6.4" height="6" rx="1"/><rect class="s1" x="55" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="63.6" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="72.2" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="80.8" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="89.4" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="98" y="38" width="6.4" height="6" rx="1"/><rect class="s1" x="55" y="63" width="4.6" height="3" rx="0.6"/><rect class="s1" x="61.4" y="62" width="4.6" height="4" rx="0.6"/><rect class="s1" x="67.8" y="63" width="4.6" height="3" rx="0.6"/><rect class="s1" x="74.2" y="61" width="4.6" height="5" rx="0.6"/><rect class="s1" x="80.6" y="60" width="4.6" height="6" rx="0.6"/><rect class="s1" x="87" y="58" width="4.6" height="8" rx="0.6"/><rect class="s1" x="93.4" y="56" width="4.6" height="10" rx="0.6"/><rect class="s1" x="99.8" y="53" width="4.6" height="13" rx="0.6"/><rect class="s1" x="55" y="72" width="50" height="2.4" rx="1"/><rect class="s1" x="55" y="77.5" width="40" height="2.4" rx="1"/><rect class="s1" x="55" y="83" width="46" height="2.4" rx="1"/></svg>
-            <img src="/captures/ko/report.webp" alt="my report로 만든 HTML 리포트의 요약. 호스트 lab-arm6의 소견은 교체 고려이고, 기록 기간은 2026-11-14부터 2026-11-16까지 부팅 3회, 오류는 CE 35건, UE 1건입니다." width="1600" height="1000" loading="lazy" decoding="async">
+            <img src="/captures/ko/report.webp" alt="my report로 만든 HTML 리포트의 요약 부분. 호스트 lab-arm6의 소견은 교체 고려입니다. 기록 기간은 2026-11-14부터 2026-11-16까지이고 부팅은 3번, 오류는 CE 35건, UE 1건입니다." width="1600" height="1000" loading="lazy" decoding="async">
             <span class="capture-wait">캡처 준비 중</span>
           </div>
           <figcaption>
             <h3>리포트</h3>
-            <p class="fig-d">같은 그림을 HTML 파일 하나에 담습니다. 브라우저에서 인쇄하면 PDF가 됩니다. 이 리포트는 DIMM&nbsp;6개 게스트의 사본에 세 부팅의 커널 로그를 더한 케이스입니다.</p>
+            <p class="fig-d lines"><span><code>my report</code>는 같은 그림을 HTML 파일 하나로 만듭니다.</span><span>브라우저에서 인쇄하면 PDF로 저장됩니다.</span><span>입력은 DIMM&nbsp;6개짜리 게스트의 사본과 세 부팅의 커널 로그입니다.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -288,15 +289,21 @@
   <div class="wrap sec-grid">
     <p class="sec-tag">검증</p>
     <div class="sec-body">
-      <h2 id="lab-h">실제 커널이 남긴 기록으로 시험합니다</h2>
-      <p>랩 서버의 Fedora VM(커널 <span class="nowrap">7.3.0)과</span> 그 안의 QEMU 게스트에 위치를 아는 메모리 오류를 넣고, 커널과 rasdaemon이 남긴 기록을 그대로 떠 왔습니다. 캡처는 17개입니다. 커널은 7.3.0과 6.19.10, rasdaemon은 0.8.0과 1.0.0입니다. x86_64 게스트의 머신 체크, CXL 메모리 장치의 오류, 페이지 offline, aarch64 게스트의 펌웨어 오류 레코드, 치명적 오류로 멈춘 부팅을 담았습니다.</p>
-      <p>위 그림은 이 가운데 캡처 셋을 읽었습니다.</p>
-      <dl class="caps">
-        <div><dt><code>6.19.10-ghes-multi</code></dt><dd>aarch64 게스트에 DIMM&nbsp;6개를 달고 하루 간격으로 세 번 부팅했습니다. DIMM&nbsp;4개에 펌웨어 오류 레코드 36건(CE&nbsp;35건, <span class="nowrap">UE&nbsp;1건)을</span> 넣었습니다.</dd></div>
-        <div><dt><code>6.19.10-bert-loop</code></dt><dd>x86 게스트를 세 번 부팅했습니다. QEMU가 리셋할 때마다 손으로 만든 BERT 영역을 써 넣어서, 게스트는 부팅마다 앞 부팅이 DIMM&nbsp;0의 같은 셀(row 0x1a2f, column <span class="nowrap">0x238)에서</span> 난 치명적 오류로 끝났다는 기록을 읽습니다. 게스트는 재부팅 명령으로 다시 시작했습니다.</dd></div>
-        <div><dt><code>6.19.10-ghes-loop-spread</code></dt><dd>DIMM&nbsp;6개를 단 aarch64 게스트에서 부팅 세 번 동안 부팅마다 다른 DIMM(CPU0_A1, CPU0_C1, <span class="nowrap">CPU0_E1)에</span> 치명적 펌웨어 오류 레코드를 1건씩 넣었습니다. 커널은 그때마다 패닉으로 멈췄습니다.</dd></div>
+      <h2 id="lab-h">실제 커널이 남긴 기록으로 테스트합니다</h2>
+      <p class="lines"><span>랩 서버의 Fedora VM(커널 <span class="nowrap">7.3.0)과</span> 그 안의 QEMU 게스트에 위치를 정해 메모리 오류를 주입했습니다.</span><span>커널과 rasdaemon이 남긴 기록은 그대로 캡처했습니다.</span></p>
+      <dl class="spec">
+        <div><dt>캡처</dt><dd>17개</dd></div>
+        <div><dt>커널</dt><dd>7.3.0, 6.19.10</dd></div>
+        <div><dt>rasdaemon</dt><dd>0.8.0, 1.0.0</dd></div>
+        <div><dt>담긴 기록</dt><dd>x86_64 게스트의 머신 체크, CXL 메모리 장치 오류, 페이지 offline, aarch64 게스트의 펌웨어 오류 레코드, 치명적 오류로 멈춘 부팅</dd></div>
       </dl>
-      <p>테스트는 캡처마다 넣은 오류와 MemorY가 센 오류를 대조합니다. 같은 대조를 <code>my verify</code>가 명령 하나로 합니다.</p>
+      <p>위 그림에 쓴 캡처는 아래 3개입니다.</p>
+      <dl class="caps">
+        <div><dt><code>6.19.10-ghes-multi</code></dt><dd class="lines"><span>DIMM&nbsp;6개짜리 aarch64 게스트를 하루 간격으로 세 번 부팅했습니다.</span><span>DIMM&nbsp;4개에 펌웨어 오류 레코드 36건(CE&nbsp;35건, <span class="nowrap">UE&nbsp;1건)을</span> 주입했습니다.</span></dd></div>
+        <div><dt><code>6.19.10-bert-loop</code></dt><dd class="lines"><span>x86 게스트를 세 번 부팅했습니다.</span><span>미리 만들어 둔 BERT 영역을 QEMU가 리셋할 때마다 다시 써 넣었습니다.</span><span>게스트는 부팅할 때마다, 직전 부팅이 DIMM&nbsp;0의 같은 셀(row 0x1a2f, column <span class="nowrap">0x238)에서</span> 난 치명적 오류로 끝났다는 기록을 읽습니다.</span><span>세 부팅 모두 실제로는 재부팅 명령으로 끝났습니다.</span></dd></div>
+        <div><dt><code>6.19.10-ghes-loop-spread</code></dt><dd class="lines"><span>DIMM&nbsp;6개짜리 aarch64 게스트를 세 번 부팅하며, 부팅마다 다른 DIMM(CPU0_A1, CPU0_C1, <span class="nowrap">CPU0_E1)에</span> 치명적 펌웨어 오류 레코드를 1건씩 주입했습니다.</span><span>커널은 매번 패닉으로 멈췄습니다.</span></dd></div>
+      </dl>
+      <p class="lines"><span>테스트는 캡처마다 주입한 오류와 MemorY가 센 오류를 비교합니다.</span><span><code>my verify</code>는 같은 비교를 명령 하나로 실행합니다.</span></p>
       <!-- run:lab-verify --><pre class="term term-out" tabindex="0" role="region" aria-label="my verify 실행 결과" style="--cols:80"><code><span class="ps">$ </span>my verify --root 6.19.10-ghes-multi --expect 6.19.10-ghes-multi/plan.yaml
 <span class="w">호스트</span> <span class="b">lab-arm6</span>  <span class="w">계획</span> ghes-multi
 <span class="c32"><span class="w">주입</span> 37<span class="w">건</span> <span class="w">모두</span> <span class="w">계획대로</span> <span class="w">기록됨</span></span>
@@ -352,12 +359,12 @@
             <span class="d">the generic hardware error source; kernel 6.19.10-300.fc44.aarch64;</span>
             <span class="d">machine QEMU 10.2.2 virt, ras=on, emulated without hardware</span>
             <span class="d">virtualization; rasdaemon 0.8.0</span></code></pre><!-- /run:lab-verify -->
-      <p>캡처를 읽으면서 고친 결함은 18가지이고, <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation-lab.md">validation-lab.md</a>에 하나씩 적었습니다. 두 가지 예입니다.</p>
+      <p class="lines"><span>캡처를 읽으며 결함 18개를 고쳤습니다.</span><span>전체 목록: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation-lab.md">validation-lab.md</a></span><span>그중 두 가지:</span></p>
       <ol class="gaps">
-        <li><span>dmidecode 3.7은 용량을 <code>16 GiB</code>로 적습니다. 이 표기를 읽지 못해 꽂힌 DIMM을 하나도 찾지 못했습니다.</span></li>
-        <li><span>aarch64 게스트의 패닉 한 번은 EFI 변수에 조각 16개로 남았습니다. 조각이 3초에 걸쳐 쓰여 systemd-pstore가 디렉터리 셋에 나눠 담았고, MemorY는 이를 덤프 셋으로 읽어 패닉 한 번을 부팅 셋으로 셌습니다. 부팅 5회가 15회로 보였습니다. 지금은 Part&nbsp;1부터 이어지는 조각을 덤프 하나로 읽습니다.</span></li>
+        <li><span class="lines"><span>dmidecode 3.7은 DIMM 용량을 <code>16 GiB</code>로 출력합니다.</span><span>MemorY가 이 표기를 읽지 못해서 꽂힌 DIMM을 하나도 찾지 못했습니다.</span></span></li>
+        <li><span class="lines"><span>aarch64 게스트에서 패닉 한 번의 기록이 EFI 변수에 조각 16개로 저장됐습니다.</span><span>조각이 3초에 걸쳐 쓰여서 systemd-pstore가 디렉터리 3개에 나눠 담았습니다.</span><span>MemorY는 이를 덤프 3개로 읽고 패닉 한 번을 부팅 3번으로 셌습니다.</span><span>부팅 5번이 15번으로 잡혔습니다.</span><span>지금은 Part&nbsp;1부터 이어지는 조각을 덤프 하나로 읽습니다.</span></span></li>
       </ol>
-      <p>랩에는 실제 메모리 컨트롤러, EINJ, BMC, GPU가 없습니다. 실행 중인 Linux 호스트 5대에서 돌린 결과는 <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation.md">validation.md</a>에 있습니다. 다섯 호스트 모두 가상 머신이라 EDAC 메모리 컨트롤러가 없습니다.</p>
+      <p class="lines"><span>랩에는 실제 메모리 컨트롤러, EINJ, BMC, GPU가 없습니다.</span><span>가동 중인 Linux 호스트 5대의 결과: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation.md">validation.md</a></span><span>5대 모두 가상 머신이라 EDAC 메모리 컨트롤러가 없습니다.</span></p>
     </div>
   </div>
 </section>
@@ -367,13 +374,13 @@
     <p class="sec-tag">시작</p>
     <div class="sec-body">
       <h2 id="start-h">빠른 시작 <span class="chip">개발 중</span></h2>
-      <p>바이너리 하나, 명령 하나입니다.</p>
+      <p class="lines"><span>MemorY는 바이너리 하나입니다.</span><span>인자 없이 실행합니다.</span></p>
       <pre class="term term-one"><code><span class="ps">$ </span>my</code></pre>
-      <p>릴리스는 아직 없습니다. 지금은 소스에서 빌드합니다. Go&nbsp;1.26 이상이 필요합니다.</p>
+      <p class="lines"><span>첫 릴리스는 준비 중입니다.</span><span>지금은 소스에서 빌드합니다.</span><span>Go&nbsp;1.26 이상이 필요합니다.</span></p>
       <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
 <span class="ps">$ </span>cd my
 <span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
-      <p>서버가 없어도 저장소의 랩 캡처로 돌려 볼 수 있습니다. <code>--root</code>에 캡처 디렉터리를 주면 그 호스트의 파일을 읽습니다. 로케일이 한국어면 한국어로 출력합니다.</p>
+      <p class="lines"><span>서버가 없으면 저장소에 든 랩 캡처로 돌려 봅니다.</span><span><code>--root</code>에 캡처 디렉터리를 주면 그 호스트의 파일을 읽습니다.</span><span>로케일이 한국어면 출력도 한국어입니다.</span></p>
       <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="bin/my 실행 결과" style="--cols:76"><code><span class="ps">$ </span>bin/my --root testdata/real/6.19.10-ghes-multi
 <span class="w">호스트</span> <span class="b">lab-arm6</span>  QEMU lab-arm6  2026-11-14 ~ 2026-11-16  CE 35<span class="w">건</span>, UE 1<span class="w">건</span>
 <span class="w">관측</span> <span class="w">등급</span> A
@@ -396,7 +403,7 @@
        UE<span class="w">도</span> <span class="w">게스트</span> <span class="w">메모리에</span> <span class="w">난</span> <span class="w">것까지만</span> <span class="w">보임</span>
 
  <span class="b">my dimm CPU0_E1 --root testdata/real/6.19.10-ghes-multi</span>: <span class="w">이</span> DIMM <span class="w">진찰</span> <span class="w">화면</span></code></pre><!-- /run:start-scan -->
-      <p>명령 목록과 판독법은 <code>bin/my help</code>에 있습니다. 진행 상황은 <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a>에 있습니다.</p>
+      <p class="lines"><span>명령 목록과 읽는 법: <code>bin/my help</code></span><span>개발 진행 상황: <a class="link" href="https://github.com/agenticode/my">GitHub 저장소</a></span></p>
     </div>
   </div>
 </section>

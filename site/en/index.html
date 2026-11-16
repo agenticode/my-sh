@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MemorY, a read-only memory error analysis tool</title>
-<meta name="description" content="MemorY is a read-only open source tool. It reads the memory error records of a server and draws where in a DIMM a fault sits and what shape it has. It is in development.">
+<meta name="description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool, in development.">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
 <link rel="canonical" href="https://my.sh/en/">
@@ -20,7 +20,7 @@
 <meta property="og:locale:alternate" content="ko_KR">
 <meta property="og:url" content="https://my.sh/en/">
 <meta property="og:title" content="MemorY, a read-only memory error analysis tool">
-<meta property="og:description" content="A read-only open source tool that reads the memory error records of a server and draws where in a DIMM a fault sits and what shape it has. In development.">
+<meta property="og:description" content="MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has. It is a read-only open source tool, in development.">
 <meta property="og:image" content="https://my.sh/og-en.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=6abefc5d">
+<link rel="stylesheet" href="/css/site.css?v=cd9c98a6">
 <script src="/js/site.js?v=58662300"></script>
 </head>
 <body>
@@ -55,14 +55,15 @@
     <a class="brand" href="/" aria-label="MemorY home">
       <span class="mark mark-loop"><span class="mark-size" aria-hidden="true"><b>M</b>emor<b>Y</b></span><span class="mark-live" aria-hidden="true"><span class="mk-m">M</span><span class="mk-track"><span class="mk-mid"><span class="mk-l" data-c="e">e</span><span class="mk-l" data-c="m">m</span><span class="mk-l" data-c="o">o</span><span class="mk-l" data-c="r">r</span></span><span class="mk-slide"><span class="mk-tail"><span class="mk-y">Y</span><span class="mk-ext"><span class="mk-x">.</span><span class="mk-x">s</span><span class="mk-x">h</span></span></span></span></span></span></span>
     </a>
-    <nav class="nav" aria-label="Main">
-      <a href="#what">About</a>
-      <a href="#figures">Figures</a>
-      <a href="#lab">Testing</a>
-      <a href="#start">Quick start</a>
+    <nav class="nav menu" aria-label="Main">
+      <a href="/en/" aria-current="page">Overview</a>
+      <a href="/en/download/">Download</a>
+      <a href="https://linux.io/en/">Blog</a>
+    </nav>
+    <div class="nav tools">
       <span class="lang" role="group" aria-label="Language"><a href="/?lang=ko" lang="ko" hreflang="ko">한국어</a><span class="lang-bar" aria-hidden="true">|</span><a href="/?lang=en" lang="en" hreflang="en" aria-current="true">English</a></span>
       <a class="nav-gh" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub</a>
-    </nav>
+    </div>
   </div>
 </header>
 
@@ -73,7 +74,7 @@
     <div class="hero-copy">
       <h1 class="hero-title" id="hero-title" data-enter style="--e:0"><span class="wm"><b>M</b>emor<b>Y</b></span></h1>
       <p class="slogan" data-enter style="--e:1"><span>From <b>M</b> to <b>Y</b> of memory,</span><span>one tool for all of it</span></p>
-      <p class="lede" data-enter style="--e:2">A read-only open source tool that reads the memory error records of a server and draws where in a DIMM a fault sits and what shape it has.</p>
+      <p class="lede lines" data-enter style="--e:2"><span>MemorY reads the memory error records a server has left and draws where in a DIMM a fault sits and what shape it has.</span><span>It is a read-only open source tool.</span></p>
       <div class="hero-actions" data-enter style="--e:3">
         <a class="btn" href="https://github.com/agenticode/my"><svg aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub <span class="mono">agenticode/my</span></a>
         <a class="link" href="#start">Quick start</a>
@@ -104,8 +105,8 @@
     <p class="sec-tag">About</p>
     <div class="sec-body">
       <h2 id="what-h">It only reads records</h2>
-      <p>MemorY reads the memory error records a Linux server has already written. It does not offline pages, run repairs or reset counters.</p>
-      <p>What it reads goes into one ledger, keyed by the serial number of each DIMM. The history survives reboots and follows a DIMM to another slot.</p>
+      <p class="lines"><span>MemorY reads the memory error records a Linux server has already written.</span><span>It does not offline pages, run repairs or reset counters.</span></p>
+      <p class="lines"><span>What it reads goes into one ledger, keyed by the serial number of each DIMM.</span><span>The history survives reboots.</span><span>When a DIMM moves to another slot, its history moves with it.</span></p>
       <div class="inputs">
         <span class="inputs-key">Inputs</span>
         <code>rasdaemon DB</code>
@@ -127,11 +128,11 @@
   <div class="wrap sec-grid">
     <p class="sec-tag">Problem</p>
     <div class="sec-body">
-      <h2 id="gap-h">Memory error logs are still read by hand</h2>
+      <h2 id="gap-h">People still read memory error logs by hand</h2>
       <ol class="gaps">
         <li>Each source writes its own log format.</li>
-        <li>Addresses have to be decoded into device, bank, row and column by hand.</li>
-        <li>Counters start again from zero after a reboot.</li>
+        <li>Someone has to decode each physical address into device, bank, row and column.</li>
+        <li>EDAC counters start again from zero after a reboot.</li>
         <li>Whether the DIMM or the slot is at fault comes down to a guess.</li>
         <li>Figures for a report are drawn by hand.</li>
       </ol>
@@ -145,8 +146,8 @@
       <p class="sec-tag">Figures</p>
       <div class="sec-body">
         <h2 id="figures-h">The records as figures</h2>
-        <p class="sec-lead">Each figure answers one question. The screens below are the output of MemorY for lab captures in <code>testdata/real</code> of its repository. <code>tools/captures.mjs</code> ran each command in a terminal and took the screen as printed. Where a figure is cropped, it leaves out whole lines.</p>
-        <p class="sec-lead">The first three figures show an aarch64 guest with six DIMMs. It was booted three times, a day apart, and firmware error records put 35&nbsp;corrected errors (CE) and 1&nbsp;uncorrected error (UE) into it. Four DIMMs got one fault each: a single cell, a row, a column and a bank. Two DIMMs got none. The next two figures show two guests whose boots kept stopping on fatal errors.</p>
+        <p class="sec-lead lines"><span>Every screen below is real output of MemorY.</span><span>The input is the lab captures in <code>testdata/real</code> of its repository.</span><span><code>tools/captures.mjs</code> ran each command in a terminal and took the screen as printed.</span><span>Some figures leave out whole lines of the output.</span></p>
+        <p class="sec-lead lines"><span>The first three figures read an aarch64 guest with six DIMMs.</span><span>Over three boots a day apart, 35&nbsp;corrected errors (CE) and 1&nbsp;uncorrected error (UE) were injected as firmware error records.</span><span>Four DIMMs got one fault each: a single cell, a row, a column and a bank.</span><span>The other two DIMMs have no errors.</span><span>The next two figures show two guests whose boots kept stopping on fatal errors.</span></p>
       </div>
     </div>
 
@@ -161,7 +162,7 @@
           <figcaption>
             <h3>Slot map</h3>
             <p class="fig-q">Which DIMM?</p>
-            <p class="fig-d">Draws the slots in the socket and channel layout of the board and lists the DIMMs with errors, the riskiest first.</p>
+            <p class="fig-d lines"><span>The slots are drawn in the socket and channel layout of the board.</span><span>The table lists the DIMMs with errors, the riskiest first.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -176,7 +177,7 @@
           <figcaption>
             <h3>Topology bars</h3>
             <p class="fig-q">Where do the errors gather?</p>
-            <p class="fig-d">Below the verdict card it names the rank, device and bank where the errors gather and draws the rows inside them as a bar. The width of each part is its share of the errors.</p>
+            <p class="fig-d lines"><span>Below the verdict card, the screen names the rank, device and bank where the errors gather.</span><span>The bar below splits them by row.</span><span>The width of each part is the share of that row in all errors of the DIMM.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -192,7 +193,7 @@
             <div class="fig-text">
               <h3>Address map</h3>
               <p class="fig-q">What shape is the fault?</p>
-              <p class="fig-d">Lays out one bank as a grid of rows and columns. The four screens above are the four DIMMs that got one fault each.</p>
+              <p class="fig-d lines"><span>One bank is laid out as a grid of rows and columns.</span><span>The four screens above are the four DIMMs that got one fault each.</span></p>
             </div>
             <div class="fig-legend">
               <p class="fig-key">The shape gives the fault mode.</p>
@@ -217,7 +218,7 @@
           <figcaption>
             <h3>Boots that stop on one cell</h3>
             <p class="fig-q">Is a DIMM stopping the boots?</p>
-            <p class="fig-d">The kept ledger of an x86 guest. 3 of 4 boots ended with a UE in the same cell of DIMM&nbsp;0, and <span class="nowrap">R-LOOP-01</span> points at this DIMM.</p>
+            <p class="fig-d lines"><span><code>my harvest</code> filled this kept ledger at each boot of an x86 guest.</span><span>3 of 4 boots ended with a UE in the same cell of DIMM&nbsp;0.</span><span><span class="nowrap">R-LOOP-01</span> names this DIMM as the cause.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -232,7 +233,7 @@
           <figcaption>
             <h3>Another DIMM each boot</h3>
             <p class="fig-q">Will replacing a DIMM end the stops?</p>
-            <p class="fig-d">An aarch64 guest with six DIMMs stopped on a fatal error in three boots in a row, each time on another DIMM. <span class="nowrap">R-LOOP-03</span> holds the replacement and says to check the logs of the processor and the board first.</p>
+            <p class="fig-d lines"><span>An aarch64 guest with six DIMMs stopped on a fatal error in three boots in a row.</span><span>Each time the error was on another DIMM.</span><span><span class="nowrap">R-LOOP-03</span> holds the replacement and says to check the logs of the processor and the board first.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -247,7 +248,7 @@
           <figcaption>
             <h3>Verdict card</h3>
             <p class="fig-q">What to do?</p>
-            <p class="fig-d"><code>my why</code> writes a one-line verdict, up to three pieces of evidence, the next step, and how many checks were not made and how many kinds of data are missing. The records behind the evidence and the counter-evidence are under <code>--detail</code>.</p>
+            <p class="fig-d lines"><span><code>my why</code> writes a one-line verdict and up to three pieces of evidence.</span><span>It also gives the next step, the number of checks it could not make and the number of kinds of data that are missing.</span><span>The records behind the evidence and the counter-evidence are under <code>--detail</code>.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -262,7 +263,7 @@
           <figcaption>
             <h3>Check before a reset</h3>
             <p class="fig-q">What is left after a fatal error?</p>
-            <p class="fig-d"><code>my preflight</code> lists, check by check, which records a host keeps and which it loses when it resets right after a fatal memory error. This is a copy of the same x86 guest that stopped on one cell.</p>
+            <p class="fig-d lines"><span><code>my preflight</code> lists, check by check, which records a host keeps and which it loses when it resets right after a fatal memory error.</span><span>The input is a copy of the x86 guest whose boots stopped on one cell.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -276,7 +277,7 @@
           </div>
           <figcaption>
             <h3>Report</h3>
-            <p class="fig-d">The same figures in one HTML file. Printing it from a browser gives a PDF. This report is of a case built from the copy of the six-DIMM guest and the kernel logs of its three boots.</p>
+            <p class="fig-d lines"><span><code>my report</code> puts the same figures into one HTML file.</span><span>Printing it from a browser gives a PDF.</span><span>The input is the copy of the six-DIMM guest and the kernel logs of its three boots.</span></p>
           </figcaption>
         </figure>
       </article>
@@ -289,14 +290,20 @@
     <p class="sec-tag">Testing</p>
     <div class="sec-body">
       <h2 id="lab-h">Tested on records that real kernels wrote</h2>
-      <p>Memory errors at known places were injected into a Fedora VM on a lab server (kernel 7.3.0) and into QEMU guests inside it, and the records that the kernel and rasdaemon wrote were copied as they were. There are 17 captures, from kernels 7.3.0 and 6.19.10 and rasdaemon 0.8.0 and 1.0.0. They hold machine checks of x86_64 guests, errors of a CXL memory device, page offlining, firmware error records of aarch64 guests, and boots that stopped on a fatal error.</p>
-      <p>The figures above read three of them.</p>
-      <dl class="caps">
-        <div><dt><code>6.19.10-ghes-multi</code></dt><dd>An aarch64 guest with six DIMMs, booted three times a day apart. Four DIMMs got 36 firmware error records (35&nbsp;CE, 1&nbsp;UE).</dd></div>
-        <div><dt><code>6.19.10-bert-loop</code></dt><dd>An x86 guest, booted three times. At each reset QEMU wrote a hand-made BERT region, so at every boot the guest read that the boot before had ended in a fatal error in the same cell of DIMM&nbsp;0 (row 0x1a2f, column 0x238). The guest was restarted with a reboot command.</dd></div>
-        <div><dt><code>6.19.10-ghes-loop-spread</code></dt><dd>An aarch64 guest with six DIMMs. In each of three boots one fatal firmware error record went to another DIMM (CPU0_A1, CPU0_C1, CPU0_E1). Each time the kernel stopped with a panic.</dd></div>
+      <p class="lines"><span>Memory errors at chosen places were injected into a Fedora VM on a lab server (kernel 7.3.0) and into QEMU guests inside it.</span><span>The records that the kernel and rasdaemon wrote were captured as they were.</span></p>
+      <dl class="spec">
+        <div><dt>Captures</dt><dd>17</dd></div>
+        <div><dt>Kernels</dt><dd>7.3.0, 6.19.10</dd></div>
+        <div><dt>rasdaemon</dt><dd>0.8.0, 1.0.0</dd></div>
+        <div><dt>Records</dt><dd>machine checks of x86_64 guests, errors of a CXL memory device, page offlining, firmware error records of aarch64 guests, boots that stopped on a fatal error</dd></div>
       </dl>
-      <p>The tests compare the errors injected into each capture with the errors MemorY counts. <code>my verify</code> makes the same comparison in one command.</p>
+      <p>The figures above read these three:</p>
+      <dl class="caps">
+        <div><dt><code>6.19.10-ghes-multi</code></dt><dd class="lines"><span>An aarch64 guest with six DIMMs, booted three times a day apart.</span><span>Four DIMMs got 36 firmware error records (35&nbsp;CE, 1&nbsp;UE).</span></dd></div>
+        <div><dt><code>6.19.10-bert-loop</code></dt><dd class="lines"><span>An x86 guest, booted three times.</span><span>At each reset QEMU wrote a BERT region made beforehand.</span><span>At every boot the guest read that the boot before had ended in a fatal error in the same cell of DIMM&nbsp;0 (row 0x1a2f, column 0x238).</span><span>Each boot actually ended with a reboot command.</span></dd></div>
+        <div><dt><code>6.19.10-ghes-loop-spread</code></dt><dd class="lines"><span>An aarch64 guest with six DIMMs, booted three times.</span><span>In each boot one fatal firmware error record went to another DIMM (CPU0_A1, CPU0_C1, CPU0_E1).</span><span>Each time the kernel stopped with a panic.</span></dd></div>
+      </dl>
+      <p class="lines"><span>The tests compare the errors injected into each capture with the errors MemorY counts.</span><span><code>my verify</code> makes the same comparison in one command.</span></p>
       <!-- run:lab-verify --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of my verify" style="--cols:80"><code><span class="ps">$ </span>my verify --root 6.19.10-ghes-multi --expect 6.19.10-ghes-multi/plan.yaml
 host <span class="b">lab-arm6</span>  plan ghes-multi
 <span class="c32">all 37 injections were found as planned</span>
@@ -351,12 +358,12 @@ host <span class="b">lab-arm6</span>  plan ghes-multi
                <span class="d">through the generic hardware error source; kernel</span>
                <span class="d">6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt, ras=on,</span>
                <span class="d">emulated without hardware virtualization; rasdaemon 0.8.0</span></code></pre><!-- /run:lab-verify -->
-      <p>Reading the captures turned up 18 defects. They are fixed, and <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation-lab.md">validation-lab.md</a> describes each. Two of them:</p>
+      <p class="lines"><span>Reading the captures turned up 18 defects, all fixed.</span><span>Full list: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation-lab.md">validation-lab.md</a></span><span>Two of them:</span></p>
       <ol class="gaps">
-        <li><span>dmidecode 3.7 writes the size as <code>16 GiB</code>. MemorY could not read that form and found none of the installed DIMMs.</span></li>
-        <li><span>One panic of the aarch64 guest was saved in EFI variables as 16 parts. The parts were written over 3 seconds, so systemd-pstore put them into three directories. MemorY read them as three dumps and counted one panic as three boots, and 5 boots showed as 15. Now the parts that follow on from Part&nbsp;1 are read as one dump.</span></li>
+        <li><span class="lines"><span>dmidecode 3.7 prints the size as <code>16 GiB</code>.</span><span>MemorY could not read that form and found none of the installed DIMMs.</span></span></li>
+        <li><span class="lines"><span>One panic of the aarch64 guest was saved in EFI variables as 16 parts.</span><span>The parts were written over 3 seconds, so systemd-pstore put them into three directories.</span><span>MemorY read them as three dumps and counted one panic as three boots.</span><span>5 boots showed as 15.</span><span>Now the parts that follow on from Part&nbsp;1 are read as one dump.</span></span></li>
       </ol>
-      <p>The lab has no real memory controller, EINJ, BMC or GPU. Results from five running Linux hosts are in <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation.md">validation.md</a>. All five are virtual machines, so none of them has an EDAC memory controller.</p>
+      <p class="lines"><span>The lab has no real memory controller, EINJ, BMC or GPU.</span><span>Results from five running Linux hosts: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation.md">validation.md</a></span><span>All five are virtual machines, so none of them has an EDAC memory controller.</span></p>
     </div>
   </div>
 </section>
@@ -366,13 +373,13 @@ host <span class="b">lab-arm6</span>  plan ghes-multi
     <p class="sec-tag">Start</p>
     <div class="sec-body">
       <h2 id="start-h">Quick start <span class="chip">in development</span></h2>
-      <p>MemorY is one binary. Run it with no arguments:</p>
+      <p class="lines"><span>MemorY is one binary.</span><span>Run it with no arguments:</span></p>
       <pre class="term term-one"><code><span class="ps">$ </span>my</code></pre>
-      <p>There is no release yet. Build it from source with Go&nbsp;1.26 or later.</p>
+      <p class="lines"><span>The first release is being prepared.</span><span>Until then, build it from source.</span><span>It needs Go&nbsp;1.26 or later.</span></p>
       <pre class="term"><code><span class="ps">$ </span>git clone https://github.com/agenticode/my
 <span class="ps">$ </span>cd my
 <span class="ps">$ </span>make build    <span class="cm"># bin/my</span></code></pre>
-      <p>Without a server, try it on a lab capture of the repository. With <code>--root</code> set to a capture directory it reads the files of that host. Under a Korean locale it prints in Korean.</p>
+      <p class="lines"><span>Without a server, try it on a lab capture of the repository.</span><span>With <code>--root</code> set to a capture directory it reads the files of that host.</span><span>Under a Korean locale it prints in Korean.</span></p>
       <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of bin/my" style="--cols:84"><code><span class="ps">$ </span>bin/my --root testdata/real/6.19.10-ghes-multi
 host <span class="b">lab-arm6</span>  QEMU lab-arm6  2026-11-14 to 2026-11-16  CE 35, UE 1
 observation grade A
@@ -396,7 +403,7 @@ host finding: <span class="c33">consider replacement</span>
           those that hit its own memory
 
  <span class="b">my dimm CPU0_E1 --root testdata/real/6.19.10-ghes-multi</span>: examination of this DIMM</code></pre><!-- /run:start-scan -->
-      <p><code>bin/my help</code> lists the commands and explains how to read the screens. Progress is tracked in the <a class="link" href="https://github.com/agenticode/my">GitHub repository</a>.</p>
+      <p class="lines"><span>Commands and how to read the screens: <code>bin/my help</code></span><span>Development progress: <a class="link" href="https://github.com/agenticode/my">GitHub repository</a></span></p>
     </div>
   </div>
 </section>
