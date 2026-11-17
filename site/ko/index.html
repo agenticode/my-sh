@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=43a3ba1b">
+<link rel="stylesheet" href="/css/site.css?v=8bda0f52">
 <script src="/js/site.js?v=ee0c8c34"></script>
 </head>
 <body>
@@ -78,7 +78,7 @@
       </div>
       <pre class="term term-cmd hero-install" data-enter style="--e:4" tabindex="0" role="region" aria-label="설치 명령"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
     </div>
-    <div class="hero-art" data-enter style="--e:5">
+    <figure class="hero-art" data-enter style="--e:5">
       <!-- run:hero --><pre class="term term-out term-hero" tabindex="0" role="region" aria-label="my 실행 결과: 슬롯 맵과 DIMM 표" style="--cols:52"><code><span class="ps">$ </span>my --root 6.19.10-ghes-multi
 <span class="w">호스트</span> <span class="w">소견</span>: <span class="c33"><span class="w">교체</span> <span class="w">고려</span></span>
 
@@ -90,7 +90,11 @@
  2  CPU0_D1  LABM0004  10  <span class="b c31"> 1</span>  row         <span class="c33"><span class="w">교체</span> <span class="w">고려</span></span>
  3  CPU0_B1  LABM0002  10   0  column      <span class="c33"><span class="w">교체</span> <span class="w">고려</span></span>
  4  CPU0_A1  LABM0001   3   0  single bit  <span class="c36"><span class="w">관찰</span></span></code></pre><!-- /run:hero -->
-    </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">슬롯 맵과 DIMM 표</h2>
+        <p class="cap-d">오류가 난 DIMM의 슬롯 위치와 소견을 위험한 순서로 적습니다.</p>
+      </figcaption>
+    </figure>
   </div>
 </section>
 
@@ -100,42 +104,73 @@
       <div class="capture-frame" style="--ar:1600 / 667">
         <img src="/captures/ko/dimm.webp" alt="my dimm --root 6.19.10-ghes-multi CPU0_B1 실행 화면. 판정은 교체 고려, 규칙은 R-ROW-03입니다. 고장은 rank1 dev5 bg0 bank3 col 0x1c8의 column 고장입니다. 아래 막대는 이 bank 안의 오류를 row별로 나눈 비중이고, row는 9개입니다." width="1600" height="667" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">DIMM 상세</h2>
+        <p class="cap-d">오류가 몰린 device와 row를 짚고 언제 교체할지 적습니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="address-map">
       <div class="capture-frame" style="--ar:1600 / 1260">
         <img src="/captures/ko/address-map.webp" alt="my map 실행 화면 4개. 왼쪽 위 CPU0_A1은 row 0x4d2e의 칸 하나입니다. 오른쪽 위 CPU0_D1은 row 0x2b41을 따라 가로로 늘어선 칸과 UE 하나입니다. 왼쪽 아래 CPU0_B1은 column 0x1c8을 따라 세로로 늘어선 칸입니다. 오른쪽 아래 CPU0_E1은 bank 곳곳에 흩어진 칸입니다." width="1600" height="1260" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">주소 맵</h2>
+        <p class="cap-d">고장이 셀, row, column, bank 중 어느 모양인지 격자로 보여 줍니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="repair">
       <div class="capture-frame" style="--ar:1600 / 990">
         <img src="/captures/ko/repair.webp" alt="my dimm --root 7.3.0-cxl-repair 실행 화면 2개. 위 cxl:mem1은 관찰, R-SOFT-01입니다. 리페어 줄에는 rank0 bg1 bank2 row 0x1f40의 memory sparing, 이전 6건, 이후 0건이 적혀 있습니다. 아래 cxl:mem0은 교체 고려, R-REP-02입니다. memory sparing 뒤 rank1 bg3 bank0 row 0xa7c에서 3건이 재발했고, 리페어 줄은 이전 6건, 이후 3건입니다." width="1600" height="990" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">리페어 전과 후</h2>
+        <p class="cap-d">리페어 뒤 같은 row에서 오류가 다시 난 장치를 교체 고려로 판정합니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="boots-same">
       <div class="capture-frame" style="--ar:1600 / 709">
         <img src="/captures/ko/boots-same.webp" alt="my open var/lib/my/ledger.db boots 'DIMM 0' 실행 화면. 부팅 1, 2, 3은 치명적 하드웨어 오류로 끝났습니다. 세 번 모두 DIMM 0의 rank0 dev7 bg0 bank3 row 0x1a2f col 0x238에서 UE가 났습니다. 부팅 4는 실행 중입니다. 규칙은 R-LOOP-01입니다." width="1600" height="709" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">같은 셀에서 멈춘 부팅</h2>
+        <p class="cap-d">반복된 중단을 부팅별로 따라가 DIMM&nbsp;0의 한 셀까지 좁힙니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="boots-spread">
       <div class="capture-frame" style="--ar:1600 / 842">
         <img src="/captures/ko/boots-spread.webp" alt="my open var/lib/my/ledger.db boots 실행 화면과 my why --oneline의 호스트 줄. 부팅 2, 3, 4가 중단됐고, UE는 차례로 CPU0_A1, CPU0_C1, CPU0_E1에서 났습니다. 호스트 소견은 교체 보류, 규칙은 R-LOOP-03입니다. 프로세서와 보드 로그, 전원 공급 장치, 첫 중단 전에 바뀐 것부터 점검하라고 적혀 있습니다." width="1600" height="842" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">부팅마다 다른 DIMM</h2>
+        <p class="cap-d">UE가 매번 다른 DIMM에서 나면 교체를 보류하고 보드 점검을 권합니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="verdict-card">
       <div class="capture-frame" style="--ar:1600 / 667">
         <img src="/captures/ko/verdict-card.webp" alt="my open var/lib/my/ledger.db why 'DIMM 0' 실행 화면. DIMM 0의 판정은 즉시 교체, 규칙은 R-UE-01입니다. 근거는 R-LOOP-01과 뒷받침 두 줄입니다. 다음 할 일은 DIMM 교체와 케이스 번들 첨부입니다. 번들은 보관 원장에서 만들어 반품에 첨부합니다. 신뢰도는 높음입니다." width="1600" height="667" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">판정 근거</h2>
+        <p class="cap-d">즉시 교체 판정의 근거를 적고 반품에 첨부할 케이스 번들을 안내합니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="preflight">
       <div class="capture-frame" style="--ar:1600 / 1200">
         <img src="/captures/ko/preflight.webp" alt="my preflight --root 6.19.10-bert-loop 실행 화면. 치명적 메모리 오류 직후 reset이 일어나면 이 호스트에 무엇이 남는지 점검별로 적습니다. mce-bootlog, mce-print, bert, console은 남음, erst-mce는 없음, reset-kind는 참고입니다. 실행 중인 호스트가 있어야 하는 점검 7개는 모름입니다. 기록을 잃는 점검은 없습니다." width="1600" height="1200" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">리셋 전 점검</h2>
+        <p class="cap-d">치명적 오류 직후 리셋돼도 남는 기록과 사라지는 기록을 미리 확인합니다.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="report">
-      <figcaption class="cap-label"><code>my report</code>가 만든 HTML</figcaption>
       <div class="capture-frame">
         <img src="/captures/ko/report.webp" alt="my report로 만든 HTML 리포트의 요약 부분. 호스트 lab-arm6의 소견은 교체 고려입니다. 기록 기간은 2026-11-14부터 2026-11-16까지이고 부팅은 3번, 오류는 CE 35건, UE 1건입니다." width="1600" height="1000" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">고객용 HTML 리포트</h2>
+        <p class="cap-d"><code>my report</code>가 판정과 그림을 고객에게 넘길 파일 하나로 묶습니다.</p>
+      </figcaption>
     </figure>
   </div>
 </section>

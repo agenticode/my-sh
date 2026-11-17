@@ -562,7 +562,7 @@ html[data-intro="settle"] [data-enter] {
 .shots { padding-bottom: clamp(4rem, 9vw, 7rem); }
 .shots-in {
   display: grid;
-  gap: clamp(1.5rem, 4.5vw, 4rem);
+  gap: clamp(2.25rem, 4.5vw, 4rem);
 }
 .capture { display: grid; gap: 0.75rem; min-width: 0; }
 .capture-frame {
@@ -582,13 +582,20 @@ html[data-intro="settle"] [data-enter] {
   background: #fff;
 }
 .capture.is-missing img { display: none; }
-/* 명령 줄이 그림 안에 없는 화면(리포트)에만 붙인다 */
-.cap-label {
+/* 그림 아래 두 줄: 무슨 화면인지(제목), 그 화면으로 무엇을 정하는지(한 줄).
+   글자는 작게, 색은 흐리게 두어 그림이 먼저 보이게 한다. 상자, 아이콘, 배지는 없다. */
+.cap {
+  display: grid;
+  gap: 0.125rem;
+  max-width: 46rem;
   font-size: 0.9375rem;
-  font-weight: 560;
+  line-height: 1.6;
   color: var(--ink-2);
 }
-.cap-label code { font-size: 0.875rem; font-weight: 520; color: var(--ink); }
+.cap-t { font-size: inherit; line-height: inherit; font-weight: 700; letter-spacing: -0.005em; }
+.cap-d { font-weight: 420; text-wrap-style: balance; }
+.cap code { font-size: 0.86em; font-weight: 460; }
+.hero-art .cap { margin-top: 0.875rem; }
 
 /* ---- 터미널 ---- */
 .term {
@@ -785,7 +792,7 @@ html[data-intro="settle"] [data-enter] {
   .hero-art .term-hero { --pad: 0.75rem; border-radius: 0; }
   .shots-in { width: 100%; }
   .capture-frame { border-inline: 0; border-radius: 0; }
-  .cap-label { padding-inline: var(--gutter); }
+  .cap { padding-inline: var(--gutter); font-size: 0.875rem; }
 }
 @media (max-width: 26rem) {
   .btn { width: 100%; justify-content: center; }
