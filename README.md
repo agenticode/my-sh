@@ -18,7 +18,7 @@ The production server sends `script-src 'self'`, so scripts go in files under `s
 
 ## Menu and text
 
-The top menu has three entries in both languages: the overview (`/ko/`, `/en/`), the download page (`/ko/download/`, `/en/download/`) and the blog (<https://linux.io/> for Korean, <https://linux.io/en/> for English, in the same tab). The sections of the overview are not in the menu. The link of the page itself carries `aria-current="page"`. On phones (44rem and narrower) the menu moves to a second row of the banner.
+The top menu has three entries in both languages: the overview (`/ko/`, `/en/`), the download page (`/ko/download/`, `/en/download/`) and the blog (<https://linux.io/> for Korean, <https://linux.io/en/> for English, in the same tab). The link of the page itself carries `aria-current="page"`. On phones (44rem and narrower) the menu moves to a second row of the banner.
 
 Sentences that belong together in a short block go on a line each: the block gets the class `lines` and every sentence its own `<span>` (`<p class="lines"><span>...</span><span>...</span></p>`). Longer explanations stay paragraphs, one subject per paragraph.
 
@@ -57,7 +57,9 @@ The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `tr
 
 ## Captures
 
-Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the three text blocks (the slot map and DIMM table in the hero, the `my verify` run in the lab section and the first screen of the quick start). One command makes all of them:
+The overview is the hero and then the captures, one under another at the full width of the page, in this order: topology bars, address map, repair, same cell, another DIMM each boot, verdict card, preflight, report. Only the report has a label (its image holds no command line). On screens up to 30rem the hero screen and the captures reach both edges.
+
+Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the text block of the hero (the slot map and DIMM table). One command makes all of them:
 
 ```
 node tools/captures.mjs --repo ../my
@@ -70,7 +72,7 @@ The script clones the MemorY repository at `origin/main` (`--ref` picks another 
 - replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/<lang>/index.html`;
 - writes nothing when an output holds a path of the machine it ran on.
 
-`--lang ko` or `--lang en` makes one language only. Some runs print longer lines in one language and get a wider terminal there: the address maps 60 columns in English (Korean 58), the quick start 84 (Korean 76), the hero 53 (Korean 52).
+`--lang ko` or `--lang en` makes one language only. Every figure of one pane is taken at 80 columns, so the text of each comes out at the same size on the page. Some runs print longer lines in one language and get a wider terminal there: the address maps 60 columns in English (Korean 58), the hero 53 (Korean 52).
 
 The hero shows `my --root 6.19.10-ghes-multi` from the line of the host finding to the end of the DIMM table, without the legend of the slot map (the table names the grade of each DIMM in the colour of its slot). Its font size follows the width of its box, so all 52 or 53 columns fit: about 11 px on a 390 px phone and 14 px from 768 px on.
 
@@ -78,14 +80,12 @@ The hero shows `my --root 6.19.10-ghes-multi` from the line of the host finding 
 
 | Figure | File | Commands, in `testdata/real` unless named |
 | --- | --- | --- |
-| Slot map | `slot-map.webp` | `my scan --root 6.19.10-ghes-multi` |
 | Topology bars | `dimm.webp` | `my dimm --root 6.19.10-ghes-multi CPU0_B1` |
 | Address map | `address-map.webp` | `my map --root 6.19.10-ghes-multi` for CPU0_A1, CPU0_D1, CPU0_B1 and CPU0_E1 |
 | Same cell | `boots-same.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db boots 'DIMM 0'` |
 | Another DIMM each boot | `boots-spread.webp` | in `6.19.10-ghes-loop-spread`: `my open var/lib/my/ledger.db boots`, then `... why --oneline \| tail -n 1` |
 | Verdict card | `verdict-card.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db why 'DIMM 0'` |
 | Preflight | `preflight.webp` | `my preflight --root 6.19.10-bert-loop` |
-| Fault shapes (legend) | `mode-single.webp`, `mode-row.webp`, `mode-column.webp`, `mode-bank.webp` | the grid of `my map --root 6.19.10-ghes-multi` for CPU0_A1, CPU0_D1, CPU0_B1 and CPU0_E1, without prompt and title bar, 960 x 600 |
 | Repair | `repair.webp` | `my dimm --root 7.3.0-cxl-repair` for `cxl:mem1` (quiet after its repair) and `cxl:mem0` (errors again), each up to its bars |
 | Report | `report.webp` | `my import 6.19.10-ghes-multi 6.19.10-ghes-multi/journal-all.json`, then `my report` of that bundle |
 
