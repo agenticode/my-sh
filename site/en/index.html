@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=b761763a">
+<link rel="stylesheet" href="/css/site.css?v=43a3ba1b">
 <script src="/js/site.js?v=ee0c8c34"></script>
 </head>
 <body>
@@ -90,314 +90,53 @@ host finding: <span class="c33">consider replacement</span>
  2  CPU0_D1  10  <span class="b c31"> 1</span>  row         <span class="c33">consider replacement</span>
  3  CPU0_B1  10   0  column      <span class="c33">consider replacement</span>
  4  CPU0_A1   3   0  single-bit  <span class="c36">observe</span></code></pre><!-- /run:hero -->
-      <p class="hero-note">Real output for a lab capture with six DIMMs.</p>
     </div>
   </div>
 </section>
 
-<section class="sec what" id="what" aria-labelledby="what-h">
-  <div class="wrap sec-grid">
-    <p class="sec-tag">About</p>
-    <div class="sec-body">
-      <h2 id="what-h">It only reads records</h2>
-      <p class="lines"><span>MemorY reads the memory error records a Linux server has already written.</span><span>It does not offline pages, run repairs or reset counters.</span></p>
-      <p class="lines"><span>What it reads goes into one ledger, keyed by the serial number of each DIMM.</span><span>The history survives reboots.</span><span>When a DIMM moves to another slot, its history moves with it.</span></p>
-      <div class="inputs">
-        <span class="inputs-key">Inputs</span>
-        <code>rasdaemon DB</code>
-        <code>kernel log</code>
-        <code>EDAC sysfs</code>
-        <code>SMBIOS</code>
-        <code>BMC SEL</code>
-        <code>Redfish</code>
-        <code>nvidia-smi</code>
-        <code>CXL</code>
-        <code>mcelog</code>
-        <code>FMFM JSON</code>
+<section class="shots" aria-label="MemorY screens">
+  <div class="wrap shots-in">
+    <figure class="capture rise" data-capture="dimm">
+      <div class="capture-frame" style="--ar:1600 / 799">
+        <img src="/captures/en/dimm.webp" alt="Screen of my dimm --root 6.19.10-ghes-multi CPU0_B1. Consider replacement, rule R-ROW-03, a column fault at rank1 dev5 bg0 bank3 col 0x1c8. The bar below it shows how the errors in this bank split over 9 rows." width="1600" height="799" loading="lazy" decoding="async">
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec gap" id="gap" aria-labelledby="gap-h">
-  <div class="wrap sec-grid">
-    <p class="sec-tag">Problem</p>
-    <div class="sec-body">
-      <h2 id="gap-h">People still read memory error logs by hand</h2>
-      <ol class="gaps">
-        <li>Each source writes its own log format.</li>
-        <li>Someone has to decode each physical address into device, bank, row and column.</li>
-        <li>EDAC counters start again from zero after a reboot.</li>
-        <li>Whether the DIMM or the slot is at fault comes down to a guess.</li>
-        <li>Figures for a report are drawn by hand.</li>
-      </ol>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="figures" aria-labelledby="figures-h">
-  <div class="wrap">
-    <div class="sec-grid">
-      <p class="sec-tag">Figures</p>
-      <div class="sec-body">
-        <h2 id="figures-h">The records as figures</h2>
-        <p class="sec-lead lines"><span>Every screen below is real output of MemorY.</span><span>The input is the lab captures in <code>testdata/real</code> of its repository.</span><span><code>tools/captures.mjs</code> ran each command in a terminal and took the screen as printed.</span><span>Some figures leave out whole lines of the output.</span></p>
-        <p class="sec-lead lines"><span>The first three figures read an aarch64 guest with six DIMMs.</span><span>Over three boots a day apart, 35&nbsp;corrected errors (CE) and 1&nbsp;uncorrected error (UE) were injected as firmware error records.</span><span>Four DIMMs got one fault each: a single cell, a row, a column and a bank.</span><span>The other two DIMMs have no errors.</span><span>The fourth figure shows a repair of CXL memory devices.</span><span>The two after it show two guests whose boots kept stopping on fatal errors.</span></p>
+    </figure>
+    <figure class="capture rise" data-capture="address-map">
+      <div class="capture-frame" style="--ar:1600 / 1223">
+        <img src="/captures/en/address-map.webp" alt="Four my map screens. Top left, CPU0_A1: one cell at row 0x4d2e. Top right, CPU0_D1: cells along row 0x2b41 and one UE. Bottom left, CPU0_B1: cells down column 0x1c8. Bottom right, CPU0_E1: cells scattered over the bank." width="1600" height="1223" loading="lazy" decoding="async">
       </div>
-    </div>
-
-    <div class="figs">
-      <article class="fig rise">
-        <figure class="capture" data-capture="slot-map">
-          <div class="capture-frame">
-            <img src="/captures/en/slot-map.webp" alt="Screen of my scan --root 6.19.10-ghes-multi. The finding for host lab-arm6 is consider replacement. Of the six slots of CPU0, B1, D1 and E1 are consider replacement, A1 is observe, C1 and F1 are ok. The table lists CE, UE and fault mode of four DIMMs." width="1600" height="1000" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Slot map</h3>
-            <p class="fig-q">Which DIMM?</p>
-            <p class="fig-d lines"><span>The slots are drawn in the socket and channel layout of the board.</span><span>The table lists the DIMMs with errors, the riskiest first.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig rise">
-        <figure class="capture" data-capture="dimm">
-          <div class="capture-frame">
-            <img src="/captures/en/dimm.webp" alt="Screen of my dimm --root 6.19.10-ghes-multi CPU0_B1. Consider replacement, rule R-ROW-03, a column fault at rank1 dev5 bg0 bank3 col 0x1c8. The bar below it shows how the errors in this bank split over 9 rows." width="1600" height="1000" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Topology bars</h3>
-            <p class="fig-q">Where do the errors gather?</p>
-            <p class="fig-d lines"><span>Below the verdict card, the screen names the rank, device and bank where the errors gather.</span><span>The bar below splits them by row.</span><span>The width of each part is the share of that row in all errors of the DIMM.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig fig-full rise">
-        <figure class="capture" data-capture="address-map">
-          <div class="capture-frame" style="--ar:1600 / 1223">
-            <img src="/captures/en/address-map.webp" alt="Four my map screens. Top left, CPU0_A1: one cell at row 0x4d2e. Top right, CPU0_D1: cells along row 0x2b41 and one UE. Bottom left, CPU0_B1: cells down column 0x1c8. Bottom right, CPU0_E1: cells scattered over the bank." width="1600" height="1223" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <div class="fig-text">
-              <h3>Address map</h3>
-              <p class="fig-q">What shape is the fault?</p>
-              <p class="fig-d lines"><span>One bank is laid out as a grid of rows and columns.</span><span>The four screens above are the four DIMMs that got one fault each.</span></p>
-            </div>
-            <div class="fig-legend">
-              <p class="fig-key">The shape gives the fault mode.</p>
-              <ul class="shapes">
-                <li><img src="/captures/en/mode-single.webp" alt="Part of the address map of CPU0_A1: one cell" width="960" height="600" loading="lazy" decoding="async"><span class="shape-name">Dot</span><code>single bit</code></li>
-                <li><img src="/captures/en/mode-row.webp" alt="Part of the address map of CPU0_D1: cells along row 0x2b41 and one uncorrected error" width="960" height="600" loading="lazy" decoding="async"><span class="shape-name">Horizontal line</span><code>row</code></li>
-                <li><img src="/captures/en/mode-column.webp" alt="Part of the address map of CPU0_B1: cells down column 0x1c8" width="960" height="600" loading="lazy" decoding="async"><span class="shape-name">Vertical line</span><code>column</code></li>
-                <li><img src="/captures/en/mode-bank.webp" alt="Part of the address map of CPU0_E1: cells scattered over the bank" width="960" height="600" loading="lazy" decoding="async"><span class="shape-name">Cloud</span><code>bank</code></li>
-              </ul>
-            </div>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig fig-wide rise">
-        <figure class="capture" data-capture="repair">
-          <div class="capture-frame" style="--ar:1600 / 1079">
-            <img src="/captures/en/repair.webp" alt="Two screens of my dimm --root 7.3.0-cxl-repair. Top, cxl:mem1: observe, R-SOFT-01; its repair line reads memory sparing at rank0 bg1 bank2 row 0x1f40, 6 errors before, 0 after. Bottom, cxl:mem0: consider replacement, R-REP-02, 3 errors at rank1 bg3 bank0 row 0xa7c after the memory sparing; its repair line reads 6 errors before, 3 after." width="1600" height="1079" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Before and after a repair</h3>
-            <p class="fig-q">Did the repaired place go quiet</p>
-            <p class="fig-d lines"><span>Two CXL memory devices got 6&nbsp;corrected errors each, in one row.</span><span>The guest repaired that row with a soft PPR through the kernel's EDAC interface.</span><span>Each device left one repair record (memory sparing).</span><span>Afterwards mem1 stayed quiet, and the same row of mem0 had 3&nbsp;corrected errors again.</span><span><span class="nowrap">R-REP-02</span> grades mem0 consider replacement.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig rise">
-        <figure class="capture" data-capture="boots-same">
-          <div class="capture-frame">
-            <img src="/captures/en/boots-same.webp" alt="Screen of my open var/lib/my/ledger.db boots &#39;DIMM 0&#39;. Boots 1, 2 and 3 ended in a fatal hardware error, each with a UE at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 of DIMM 0. Boot 4 is running. The rule is R-LOOP-01." width="1600" height="1000" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Boots that stop on one cell</h3>
-            <p class="fig-q">Is a DIMM stopping the boots?</p>
-            <p class="fig-d lines"><span><code>my harvest</code> filled this kept ledger at each boot of an x86 guest.</span><span>3 of 4 boots ended with a UE in the same cell of DIMM&nbsp;0.</span><span><span class="nowrap">R-LOOP-01</span> names this DIMM as the cause.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig rise">
-        <figure class="capture" data-capture="boots-spread">
-          <div class="capture-frame">
-            <img src="/captures/en/boots-spread.webp" alt="Screen of my open var/lib/my/ledger.db boots and the host line of my why --oneline. Boots 2, 3 and 4 stopped, with the UE on CPU0_A1, CPU0_C1 and CPU0_E1 in turn. The host finding is hold replacement, rule R-LOOP-03. It says to check the logs of the processor and the board, the power supply, and what changed before the first stop." width="1600" height="1000" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Another DIMM each boot</h3>
-            <p class="fig-q">Will replacing a DIMM end the stops?</p>
-            <p class="fig-d lines"><span>An aarch64 guest with six DIMMs stopped on a fatal error in three boots in a row.</span><span>Each time the error was on another DIMM.</span><span><span class="nowrap">R-LOOP-03</span> holds the replacement and says to check the logs of the processor and the board first.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig fig-wide rise">
-        <figure class="capture" data-capture="verdict-card">
-          <div class="capture-frame" style="--ar:1600 / 972">
-            <img src="/captures/en/verdict-card.webp" alt="Screen of my open var/lib/my/ledger.db why &#39;DIMM 0&#39;. DIMM 0 is replace now, rule R-UE-01. The evidence is R-LOOP-01 and two supporting lines. The next step is to replace the DIMM and attach a case bundle written from the kept ledger to the return. Confidence is high." width="1600" height="972" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Verdict card</h3>
-            <p class="fig-q">What to do?</p>
-            <p class="fig-d lines"><span><code>my why</code> writes a one-line verdict and up to three pieces of evidence.</span><span>It also gives the next step, the number of checks it could not make and the number of kinds of data that are missing.</span><span>The records behind the evidence and the counter-evidence are under <code>--detail</code>.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig fig-wide rise">
-        <figure class="capture" data-capture="preflight">
-          <div class="capture-frame" style="--ar:1600 / 1244">
-            <img src="/captures/en/preflight.webp" alt="Screen of my preflight --root 6.19.10-bert-loop. Check by check, it lists what a reset right after a fatal memory error would leave on this host. mce-bootlog, mce-print, bert and console are kept, erst-mce is none, reset-kind is info, and 7 checks that need the running host are unknown. No check would lose records." width="1600" height="1244" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Check before a reset</h3>
-            <p class="fig-q">What is left after a fatal error?</p>
-            <p class="fig-d lines"><span><code>my preflight</code> lists, check by check, which records a host keeps and which it loses when it resets right after a fatal memory error.</span><span>The input is a copy of the x86 guest whose boots stopped on one cell.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-
-      <article class="fig fig-wide rise">
-        <figure class="capture" data-capture="report">
-          <div class="capture-frame">
-            <img src="/captures/en/report.webp" alt="Summary of the HTML report written by my report. The finding for host lab-arm6 is consider replacement. The records cover 2026-11-14 to 2026-11-16 and 3 boots, with 35 CE and 1 UE." width="1600" height="1000" loading="lazy" decoding="async">
-          </div>
-          <figcaption>
-            <h3>Report</h3>
-            <p class="fig-d lines"><span><code>my report</code> puts the same figures into one HTML file.</span><span>Printing it from a browser gives a PDF.</span><span>The input is the copy of the six-DIMM guest and the kernel logs of its three boots.</span></p>
-          </figcaption>
-        </figure>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="lab" aria-labelledby="lab-h">
-  <div class="wrap sec-grid">
-    <p class="sec-tag">Testing</p>
-    <div class="sec-body">
-      <h2 id="lab-h">Tested on records that real kernels wrote</h2>
-      <p class="lines"><span>Memory errors at chosen places were injected into a Fedora VM on a lab server (kernel 7.3.0) and into QEMU guests inside it.</span><span>The records that the kernel and rasdaemon wrote were captured as they were.</span></p>
-      <dl class="spec">
-        <div><dt>Captures</dt><dd>18</dd></div>
-        <div><dt>Kernels</dt><dd>7.3.0, 6.19.10</dd></div>
-        <div><dt>rasdaemon</dt><dd>0.8.0, 1.0.0</dd></div>
-        <div><dt>Records</dt><dd>machine checks of x86_64 guests, errors and repairs of CXL memory devices, page offlining, firmware error records of aarch64 guests, boots that stopped on a fatal error</dd></div>
-      </dl>
-      <p>The figures above read these four:</p>
-      <dl class="caps">
-        <div><dt><code>7.3.0-cxl-repair</code></dt><dd class="lines"><span>An x86 guest with two CXL memory devices, emulated by QEMU 11.1.3.</span><span>Corrected errors went into one row of each, the guest repaired that row with a soft PPR, then one device got errors in the same row again.</span></dd></div>
-        <div><dt><code>6.19.10-ghes-multi</code></dt><dd class="lines"><span>An aarch64 guest with six DIMMs, booted three times a day apart.</span><span>Four DIMMs got 36 firmware error records (35&nbsp;CE, 1&nbsp;UE).</span></dd></div>
-        <div><dt><code>6.19.10-bert-loop</code></dt><dd class="lines"><span>An x86 guest, booted three times.</span><span>At each reset QEMU wrote a BERT region made beforehand.</span><span>At every boot the guest read that the boot before had ended in a fatal error in the same cell of DIMM&nbsp;0 (row 0x1a2f, column 0x238).</span><span>Each boot actually ended with a reboot command.</span></dd></div>
-        <div><dt><code>6.19.10-ghes-loop-spread</code></dt><dd class="lines"><span>An aarch64 guest with six DIMMs, booted three times.</span><span>In each boot one fatal firmware error record went to another DIMM (CPU0_A1, CPU0_C1, CPU0_E1).</span><span>Each time the kernel stopped with a panic.</span></dd></div>
-      </dl>
-      <p class="lines"><span>The tests compare the errors injected into each capture with the errors MemorY counts.</span><span><code>my verify</code> makes the same comparison in one command.</span></p>
-      <!-- run:lab-verify --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of my verify" style="--cols:80"><code><span class="ps">$ </span>my verify --root 6.19.10-ghes-multi --expect 6.19.10-ghes-multi/plan.yaml
-host <span class="b">lab-arm6</span>  plan ghes-multi
-<span class="c32">all 37 injections were found as planned</span>
-<span class="d">firmware error records in an aarch64 guest with six DIMMs over three boots a day</span>
-<span class="d">apart: a row, a column, a bank and a single cell fault on four DIMMs, 35</span>
-<span class="d">corrected errors and 1 uncorrected</span>
-
-<span class="d">  #  ID             INJECTED            PLANNED  FOUND  RESULT</span>
-  1  d1-row-1       CE                        1      1  <span class="c32">as planned</span>
-  2  e1-bank-1      CE                        1      1  <span class="c32">as planned</span>
-  3  b1-col-1       CE                        1      1  <span class="c32">as planned</span>
-  4  a1-cell-1      CE                        1      1  <span class="c32">as planned</span>
-  5  e1-bank-2      CE                        1      1  <span class="c32">as planned</span>
-  6  d1-row-2       CE                        1      1  <span class="c32">as planned</span>
-  7  b1-col-2       CE                        1      1  <span class="c32">as planned</span>
-  8  e1-bank-3      CE Patrol                 1      1  <span class="c32">as planned</span>
-  9  d1-row-3       CE                        1      1  <span class="c32">as planned</span>
- 10  b1-col-3       CE                        1      1  <span class="c32">as planned</span>
- 11  e1-bank-4      CE                        1      1  <span class="c32">as planned</span>
- 12  b1-col-4       CE                        1      1  <span class="c32">as planned</span>
- 13  d1-row-4       CE                        1      1  <span class="c32">as planned</span>
- 14  e1-bank-5      CE                        1      1  <span class="c32">as planned</span>
- 15  a1-cell-2      CE                        1      1  <span class="c32">as planned</span>
- 16  d1-row-5       CE Patrol                 1      1  <span class="c32">as planned</span>
- 17  e1-bank-6      CE                        1      1  <span class="c32">as planned</span>
- 18  b1-col-5       CE                        1      1  <span class="c32">as planned</span>
- 19  e1-bank-7      CE                        1      1  <span class="c32">as planned</span>
- 20  d1-row-6       CE                        1      1  <span class="c32">as planned</span>
- 21  b1-col-6       CE                        1      1  <span class="c32">as planned</span>
- 22  e1-bank-8      CE                        1      1  <span class="c32">as planned</span>
- 23  d1-row-7       CE                        1      1  <span class="c32">as planned</span>
- 24  e1-bank-9      CE                        1      1  <span class="c32">as planned</span>
- 25  b1-col-7       CE                        1      1  <span class="c32">as planned</span>
- 26  d1-row-8       CE                        1      1  <span class="c32">as planned</span>
- 27  a1-cell-3      CE                        1      1  <span class="c32">as planned</span>
- 28  e1-bank-10     CE                        1      1  <span class="c32">as planned</span>
- 29  b1-col-8       CE                        1      1  <span class="c32">as planned</span>
- 30  d1-row-9       CE                        1      1  <span class="c32">as planned</span>
- 31  e1-bank-11     CE                        1      1  <span class="c32">as planned</span>
- 32  b1-col-9       CE                        1      1  <span class="c32">as planned</span>
- 33  d1-row-10      CE                        1      1  <span class="c32">as planned</span>
- 34  b1-col-10      CE                        1      1  <span class="c32">as planned</span>
- 35  e1-bank-12     CE                        1      1  <span class="c32">as planned</span>
- 36  d1-ue          Recoverable Patrol        1      1  <span class="c32">as planned</span>
- 37  d1-ue-offline  page offline hard         1      1  <span class="c32">as planned</span>
-
- <span class="d">records     </span>  klog/edac 14, klog/ghes 14, klog/offline 1, rasdaemon/mc_event 36
- <span class="d">            </span>  <span class="d">records that match an injection, by source; an error several</span>
-               <span class="d">sources report is found once</span>
-
- <span class="d">method      </span>  <span class="d">QMP inject-ghes-v2-error of QEMU: CPER memory error sections</span>
-               <span class="d">through the generic hardware error source; kernel</span>
-               <span class="d">6.19.10-300.fc44.aarch64; machine QEMU 10.2.2 virt, ras=on,</span>
-               <span class="d">emulated without hardware virtualization; rasdaemon 0.8.0</span></code></pre><!-- /run:lab-verify -->
-      <p class="lines"><span>Reading the captures turned up 19 defects, all fixed.</span><span>Full list: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation-lab.md">validation-lab.md</a></span><span>Two of them:</span></p>
-      <ol class="gaps">
-        <li><span class="lines"><span>dmidecode 3.7 prints the size as <code>16 GiB</code>.</span><span>MemorY could not read that form and found none of the installed DIMMs.</span></span></li>
-        <li><span class="lines"><span>One panic of the aarch64 guest was saved in EFI variables as 16 parts.</span><span>The parts were written over 3 seconds, so systemd-pstore put them into three directories.</span><span>MemorY read them as three dumps and counted one panic as three boots.</span><span>5 boots showed as 15.</span><span>Now the parts that follow on from Part&nbsp;1 are read as one dump.</span></span></li>
-      </ol>
-      <p class="lines"><span>The lab has no real memory controller, EINJ, BMC or GPU.</span><span>Results from five running Linux hosts: <a class="link" href="https://github.com/agenticode/my/blob/main/docs/validation.md">validation.md</a></span><span>All five are virtual machines, so none of them has an EDAC memory controller.</span></p>
-    </div>
-  </div>
-</section>
-
-<section class="sec start" id="start" aria-labelledby="start-h">
-  <div class="wrap sec-grid">
-    <p class="sec-tag">Start</p>
-    <div class="sec-body">
-      <h2 id="start-h">Quick start</h2>
-      <p class="lines"><span>MemorY is one binary.</span><span>Install it from a Linux or macOS terminal with one line:</span></p>
-      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Install command"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
-      <p class="lines"><span>The script, the checksum of each file and how to build from source: <a class="link" href="/en/download/">Download</a></span></p>
-      <p class="lines"><span>On a server, run it with no arguments:</span></p>
-      <pre class="term term-one"><code><span class="ps">$ </span>my</code></pre>
-      <pre class="term term-cmd" tabindex="0" role="region" aria-label="Commands to get the repository"><code><span class="ps">$ </span>git clone --depth 1 https://github.com/agenticode/my
-<span class="ps">$ </span>cd my</code></pre>
-      <!-- run:start-scan --><pre class="term term-out" tabindex="0" role="region" aria-label="Output of my" style="--cols:84"><code><span class="ps">$ </span>my --root testdata/real/6.19.10-ghes-multi
-host <span class="b">lab-arm6</span>  QEMU lab-arm6  2026-11-14 to 2026-11-16  CE 35, UE 1
-observation grade A
-host finding: <span class="c33">consider replacement</span>
-
-     <span class="d">   A1   B1   C1   D1   E1   F1</span>
- CPU0   <span class="c36">▒▒</span>   <span class="c33">▓▓</span>   <span class="c32">░░</span>   <span class="c33">▓▓</span>   <span class="c33">▓▓</span>   <span class="c32">░░</span>
-
- <span class="c33">▓▓</span> consider replacement   <span class="c36">▒▒</span> observe   <span class="c32">░░</span> ok    <span class="d">6 slots, 6 DIMMs</span>
-
-<span class="d"> #  SLOT     SERIAL    CE  UE  MODE        TREND 30D     FINDING</span>
- 1  CPU0_E1  LABM0005  12   0  bank        ▁▁▁▁▁▁▁▁▁█ ?  <span class="c33">consider replacement</span>
- 2  CPU0_D1  LABM0004  10  <span class="b c31"> 1</span>  row         ▁▁▁▁▁▁▁▁▁█ ?  <span class="c33">consider replacement</span>
- 3  CPU0_B1  LABM0002  10   0  column      ▁▁▁▁▁▁▁▁▁█ ?  <span class="c33">consider replacement</span>
- 4  CPU0_A1  LABM0001   3   0  single-bit  ▁▁▁▁▁▁▁▁▁█ ?  <span class="c36">observe</span>
-
- 2 DIMMs without errors
- <span class="d">sources</span>  rasdaemon, klog, edac-sysfs
- <span class="d">note   </span>  This host is a virtual machine (QEMU): a guest is not shown the corrected
-          errors of the machine it runs on, and of the uncorrected ones at most
-          those that hit its own memory
-
- <span class="b">my dimm CPU0_E1 --root testdata/real/6.19.10-ghes-multi</span>: examination of this DIMM</code></pre><!-- /run:start-scan -->
-      <p class="lines"><span>Commands and how to read the screens: <code>my help</code></span><span>Development progress: <a class="link" href="https://github.com/agenticode/my">GitHub repository</a></span></p>
-    </div>
+    </figure>
+    <figure class="capture rise" data-capture="repair">
+      <div class="capture-frame" style="--ar:1600 / 1079">
+        <img src="/captures/en/repair.webp" alt="Two screens of my dimm --root 7.3.0-cxl-repair. Top, cxl:mem1: observe, R-SOFT-01; its repair line reads memory sparing at rank0 bg1 bank2 row 0x1f40, 6 errors before, 0 after. Bottom, cxl:mem0: consider replacement, R-REP-02, 3 errors at rank1 bg3 bank0 row 0xa7c after the memory sparing; its repair line reads 6 errors before, 3 after." width="1600" height="1079" loading="lazy" decoding="async">
+      </div>
+    </figure>
+    <figure class="capture rise" data-capture="boots-same">
+      <div class="capture-frame" style="--ar:1600 / 754">
+        <img src="/captures/en/boots-same.webp" alt="Screen of my open var/lib/my/ledger.db boots &#39;DIMM 0&#39;. Boots 1, 2 and 3 ended in a fatal hardware error, each with a UE at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 of DIMM 0. Boot 4 is running. The rule is R-LOOP-01." width="1600" height="754" loading="lazy" decoding="async">
+      </div>
+    </figure>
+    <figure class="capture rise" data-capture="boots-spread">
+      <div class="capture-frame" style="--ar:1600 / 932">
+        <img src="/captures/en/boots-spread.webp" alt="Screen of my open var/lib/my/ledger.db boots and the host line of my why --oneline. Boots 2, 3 and 4 stopped, with the UE on CPU0_A1, CPU0_C1 and CPU0_E1 in turn. The host finding is hold replacement, rule R-LOOP-03. It says to check the logs of the processor and the board, the power supply, and what changed before the first stop." width="1600" height="932" loading="lazy" decoding="async">
+      </div>
+    </figure>
+    <figure class="capture rise" data-capture="verdict-card">
+      <div class="capture-frame" style="--ar:1600 / 843">
+        <img src="/captures/en/verdict-card.webp" alt="Screen of my open var/lib/my/ledger.db why &#39;DIMM 0&#39;. DIMM 0 is replace now, rule R-UE-01. The evidence is R-LOOP-01 and two supporting lines. The next step is to replace the DIMM and attach a case bundle written from the kept ledger to the return. Confidence is high." width="1600" height="843" loading="lazy" decoding="async">
+      </div>
+    </figure>
+    <figure class="capture rise" data-capture="preflight">
+      <div class="capture-frame" style="--ar:1600 / 1244">
+        <img src="/captures/en/preflight.webp" alt="Screen of my preflight --root 6.19.10-bert-loop. Check by check, it lists what a reset right after a fatal memory error would leave on this host. mce-bootlog, mce-print, bert and console are kept, erst-mce is none, reset-kind is info, and 7 checks that need the running host are unknown. No check would lose records." width="1600" height="1244" loading="lazy" decoding="async">
+      </div>
+    </figure>
+    <figure class="capture rise" data-capture="report">
+      <figcaption class="cap-label">HTML from <code>my report</code></figcaption>
+      <div class="capture-frame">
+        <img src="/captures/en/report.webp" alt="Summary of the HTML report written by my report. The finding for host lab-arm6 is consider replacement. The records cover 2026-11-14 to 2026-11-16 and 3 boots, with 35 CE and 1 UE." width="1600" height="1000" loading="lazy" decoding="async">
+      </div>
+    </figure>
   </div>
 </section>
 

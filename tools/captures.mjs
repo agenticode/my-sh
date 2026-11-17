@@ -17,9 +17,8 @@
 //
 // A run may also leave out lines by pattern (`drop`), start at a line
 // (`from`), and a pane may show no prompt (`prompt: false`). A figure marked
-// `inline` is an image the page shows without a figure frame (the shapes of
-// the fault modes); the page gives its size, and the run does not touch the
-// page for it.
+// `inline` is an image the page shows without a figure frame; the page gives
+// its size, and the run does not touch the page for it.
 //
 // --lang ko or --lang en makes one language only; the default is both.
 //
@@ -49,7 +48,6 @@ const LANGS = { ko: 'ko_KR.UTF-8', en: 'en_US.UTF-8' };
 // keep: which lines of the output a figure shows. Lines are counted from 1,
 // as the command printed them (before the terminal wraps a long line). A keep
 // that depends on the words of the output is given per language.
-const upto = (re) => (lines) => { const i = lines.findIndex((l) => re.test(l)); return i < 0 ? lines.length : i + 1; };
 const before = (re) => (lines) => { const i = lines.findIndex((l) => re.test(l)); return i < 0 ? lines.length : i; };
 const each = (ko, en) => ({ ko, en });
 const hint = /^ ?my (open |dimm |boots |why |help)|: (이 DIMM|판정 근거|판독법|examination of)/;
@@ -57,26 +55,11 @@ const hint = /^ ?my (open |dimm |boots |why |help)|: (이 DIMM|판정 근거|판
 // A map ends before the sentence about its fault.
 function mapKeep(ko) { return each(before(ko), before(/^ \S+ fault at /)); }
 
-// The grid of a map alone: from the line of the column axis to the last row.
-const mapGrid = (lines) => {
-  const a = lines.findIndex((l) => /^ row +0x0+ /.test(l));
-  let b = a + 1;
-  while (b < lines.length && /^ 0x[0-9a-f]+ +[·░▒▓█X]/.test(lines[b])) b++;
-  return a < 0 ? [0, lines.length] : [a, b];
-};
-// One figure per fault shape, for the legend under the address maps.
-const shape = (name, dimm) => ({
-  name, dir: 'testdata/real', cols: 56, size: [960, 600], inline: true, bar: false,
-  panes: [[{ prompt: false, runs: [{ argv: ['my', 'map', '--root', MULTI, dimm], crop: mapGrid }] }]],
-});
-
+// The page shows the figures one under another at its full width. Every figure of one
+// pane is taken at 80 columns, so the text of each comes out at the same size.
 const FIGURES = [
   {
-    name: 'slot-map', dir: 'testdata/real', cols: 64,
-    panes: [[{ runs: [{ argv: ['my', 'scan', '--root', MULTI], keep: each(upto(/오류 없는 DIMM/), upto(/DIMMs? without errors/)) }] }]],
-  },
-  {
-    name: 'dimm', dir: 'testdata/real', cols: 72,
+    name: 'dimm', dir: 'testdata/real', cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'dimm', '--root', MULTI, 'CPU0_B1'], keep: each(before(/row x column/), before(/row by column/)) }] }]],
   },
   {
@@ -90,28 +73,24 @@ const FIGURES = [
     ],
   },
   {
-    name: 'boots-same', dir: `testdata/real/${LOOP}`, cols: 64,
+    name: 'boots-same', dir: `testdata/real/${LOOP}`, cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'open', 'var/lib/my/ledger.db', 'boots', 'DIMM 0'], keep: before(hint) }] }]],
   },
   {
-    name: 'boots-spread', dir: `testdata/real/${SPREAD}`, cols: 64,
+    name: 'boots-spread', dir: `testdata/real/${SPREAD}`, cols: 80, size: 'auto',
     panes: [[{ runs: [
       { argv: ['my', 'open', 'var/lib/my/ledger.db', 'boots'], keep: before(/^ · /) },
       { shell: 'my open var/lib/my/ledger.db why --oneline | tail -n 1' },
     ] }]],
   },
   {
-    name: 'verdict-card', dir: `testdata/real/${LOOP}`, cols: 72, size: 'auto',
+    name: 'verdict-card', dir: `testdata/real/${LOOP}`, cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'open', 'var/lib/my/ledger.db', 'why', 'DIMM 0'] }] }]],
   },
   {
     name: 'preflight', dir: 'testdata/real', cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'preflight', '--root', LOOP] }] }]],
   },
-  shape('mode-single', 'CPU0_A1'),
-  shape('mode-row', 'CPU0_D1'),
-  shape('mode-column', 'CPU0_B1'),
-  shape('mode-bank', 'CPU0_E1'),
   {
     // A repair that held and one that did not: the card of each CXL device.
     name: 'repair', dir: 'testdata/real', cols: 80, size: 'auto',
@@ -130,8 +109,7 @@ const REPORT = {
   argv: ['my', 'report'],
 };
 
-// Blocks of text on the page. The quick start runs `my` from the top of the
-// repository, as a reader does after the install script and `git clone`.
+// Blocks of text on the page.
 const BLOCKS = [
   // The hero: which DIMM, what shape, what to do, in as few columns as the
   // table takes.
@@ -140,11 +118,6 @@ const BLOCKS = [
   { name: 'hero', dir: 'testdata/real', cols: each(52, 53), cls: 'term-hero', label: each('my 실행 결과: 슬롯 맵과 DIMM 표', 'Output of my: slot map and DIMM table'),
     runs: [{ argv: ['my', '--root', MULTI], from: /^(호스트 소견|host finding)/, drop: /^ [▓▒░█]{2} |^ \d+ slots?, \d+ DIMMs?$/,
       keep: each(before(/^ 오류 없는 DIMM/), before(/^ \d+ DIMMs? without errors/)) }] },
-  { name: 'lab-verify', dir: 'testdata/real', cols: 80, label: each('my verify 실행 결과', 'Output of my verify'),
-    runs: [{ argv: ['my', 'verify', '--root', MULTI, '--expect', `${MULTI}/plan.yaml`] }] },
-  // In English the table keeps its trend column from 84 columns on, as the Korean one does at 76.
-  { name: 'start-scan', dir: '.', cols: each(76, 84), label: each('my 실행 결과', 'Output of my'),
-    runs: [{ argv: ['my', '--root', `testdata/real/${MULTI}`] }] },
 ];
 
 // The look of a terminal block; site/css/site.css has the same rules for the page.
