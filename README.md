@@ -57,7 +57,7 @@ The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `tr
 
 ## Captures
 
-The overview is the hero and then the captures, one under another at the full width of the page, in this order: topology bars, address map, repair, same cell, another DIMM each boot, verdict card, preflight, report. On screens up to 30rem the hero screen and the captures reach both edges.
+The overview is the hero and then the captures, one under another at the full width of the page, in this order: board, topology bars, address map, repair, same cell, another DIMM each boot, verdict card, preflight, report, board in the report, population, SPD. On screens up to 30rem the hero screen and the captures reach both edges.
 
 Under the hero screen and under each capture is a caption (`<figcaption class="cap">`): a title of two to five words and one line on the problem the screen solves, in small muted text. The captions are written by hand from what the screen shows. `tools/captures.mjs` leaves them as they are, so reread them when a screen changes.
 
@@ -70,6 +70,7 @@ node tools/captures.mjs --repo ../my
 The script clones the MemorY repository at `origin/main` (`--ref` picks another commit), builds it with `make build`, and runs each command on the lab captures in its `testdata/real`, once per page language. Every command runs in a pseudo-terminal of a fixed width with the locale of that language, `ko_KR.UTF-8` or `en_US.UTF-8` (`tools/ptyrun.py`), so the tool picks its colours, width and language as it does at a terminal. The output is used as printed. A figure may leave out whole lines: `keep` ends a run at a line, `from` starts it at one, `crop` keeps a range and `drop` leaves out the lines that match a pattern. Then the script
 
 - renders each figure with Chrome and writes `site/captures/<lang>/<name>.webp`, 1600 px wide;
+- writes two reports with `my report --root` and takes a crop of section 2 of each with Playwright's Chromium (see below);
 - writes the path, width and height of each image into its `<figure>` in `site/<lang>/index.html`, and the ratio of the frame when it is not 16:10;
 - replaces the `<pre>` between `<!-- run:NAME -->` and `<!-- /run:NAME -->` in `site/<lang>/index.html`;
 - writes nothing when an output holds a path of the machine it ran on.
@@ -78,10 +79,13 @@ The script clones the MemorY repository at `origin/main` (`--ref` picks another 
 
 The hero shows `my --root 6.19.10-ghes-multi` from the line of the host finding to the end of the DIMM table, without the legend of the slot map (the table names the grade of each DIMM in the colour of its slot). Its font size follows the width of its box, so all 52 or 53 columns fit: about 11 px on a 390 px phone and 14 px from 768 px on.
 
-`--shots DIR` keeps the PNG of each figure (in `DIR/<lang>/`) and the raw output of each run. It needs git, make, Go, python3, cwebp and Chrome (`CHROME` if Chrome is not in the default macOS location).
+The crops of a report (`CROPS` in the script) are taken in a window 1280 CSS px wide, the window of the report capture. A crop runs from the heading of section 2 to the end of the board and stands 24 px outside what it shows at the left and right; it is taken at the scale that makes it 1600 px wide. For `report-board` the pointer rests on the stick of `CPU0_D1`, on its right edge a quarter down, so the card of that module opens beside the stick. `population` keeps the block "Population" under the board, up to its third finding with the line that names the document. The script stops when the card does not open, when the block is missing or when the report logs an error. Playwright is loaded from the local or the global npm packages.
+
+`--shots DIR` keeps the PNG of each figure (in `DIR/<lang>/`) and the raw output of each run. It needs git, make, Go, python3, cwebp, Chrome (`CHROME` if Chrome is not in the default macOS location) and Playwright with its Chromium.
 
 | Figure | File | Commands, in `testdata/real` unless named |
 | --- | --- | --- |
+| Board | `board.webp` | `my board --root 6.19.10-ghes-multi` |
 | Topology bars | `dimm.webp` | `my dimm --root 6.19.10-ghes-multi CPU0_B1` |
 | Address map | `address-map.webp` | `my map --root 6.19.10-ghes-multi` for CPU0_A1, CPU0_D1, CPU0_B1 and CPU0_E1 |
 | Same cell | `boots-same.webp` | in `6.19.10-bert-loop`: `my open var/lib/my/ledger.db boots 'DIMM 0'` |
@@ -90,6 +94,9 @@ The hero shows `my --root 6.19.10-ghes-multi` from the line of the host finding 
 | Preflight | `preflight.webp` | `my preflight --root 6.19.10-bert-loop` |
 | Repair | `repair.webp` | `my dimm --root 7.3.0-cxl-repair` for `cxl:mem1` (quiet after its repair) and `cxl:mem0` (errors again), each up to its bars |
 | Report | `report.webp` | `my import 6.19.10-ghes-multi 6.19.10-ghes-multi/journal-all.json`, then `my report` of that bundle |
+| Board in the report | `report-board.webp` | `my report --root 6.19.10-ghes-multi`, section 2 with the card of `CPU0_D1` open |
+| Population | `population.webp` | in `testdata/explorer`: `my report --root population-demo`, section 2 with the marks of the vendor's table and the block "Population" |
+| SPD | `spd.webp` | in `testdata/spd`: `my spd --root demo` (public SPD dumps replayed with a serial number and a week per slot; no server was read) |
 
 Until an image loads, its frame is empty; an image that fails to load is hidden. The server caches images for one hour, so a replaced file can take that long to show.
 
