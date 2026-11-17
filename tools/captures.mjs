@@ -20,13 +20,17 @@
 // `inline` is an image the page shows without a figure frame; the page gives
 // its size, and the run does not touch the page for it.
 //
+// The crops of the report (CROPS) are taken with Playwright and its Chromium,
+// because a card of the board opens only under the pointer.
+//
 // --lang ko or --lang en makes one language only; the default is both.
 //
-// Needs git, make, Go, python3, cwebp and Chrome (set CHROME if it is not in
-// the default macOS location). With --shots DIR the PNG of each figure and the
+// Needs git, make, Go, python3, cwebp, Chrome (set CHROME if it is not in
+// the default macOS location) and Playwright (local or global npm package). With --shots DIR the PNG of each figure and the
 // raw output of each run are kept in DIR for review.
 
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, copyFileSync } from 'node:fs';
 import { homedir, tmpdir, userInfo } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -41,6 +45,8 @@ const MULTI = '6.19.10-ghes-multi'; // six DIMMs, four fault shapes
 const REPAIR = '7.3.0-cxl-repair'; // two CXL devices, a soft PPR of one row each
 const LOOP = '6.19.10-bert-loop'; // the same cell in three boots
 const SPREAD = '6.19.10-ghes-loop-spread'; // every boot another DIMM
+const POPULATION = 'population-demo'; // in testdata/explorer: two modules in slots the vendor's table leaves empty
+const SPD = 'demo'; // in testdata/spd: eight DDR5 modules with public SPD dumps
 
 // The page languages and the locale their runs get.
 const LANGS = { ko: 'ko_KR.UTF-8', en: 'en_US.UTF-8' };
@@ -58,6 +64,11 @@ function mapKeep(ko) { return each(before(ko), before(/^ \S+ fault at /)); }
 // The page shows the figures one under another at its full width. Every figure of one
 // pane is taken at 80 columns, so the text of each comes out at the same size.
 const FIGURES = [
+  {
+    // Where each DIMM sits: the CPU, the banks beside it, every slot by socket and channel.
+    name: 'board', dir: 'testdata/real', cols: 80, size: 'auto',
+    panes: [[{ runs: [{ argv: ['my', 'board', '--root', MULTI] }] }]],
+  },
   {
     name: 'dimm', dir: 'testdata/real', cols: 80, size: 'auto',
     panes: [[{ runs: [{ argv: ['my', 'dimm', '--root', MULTI, 'CPU0_B1'], keep: each(before(/row x column/), before(/row by column/)) }] }]],
@@ -99,6 +110,11 @@ const FIGURES = [
       [{ runs: [{ argv: ['my', 'dimm', '--root', REPAIR, 'cxl:mem0'], keep: each(before(/안에서 오류가 몰린/), before(/^ where the errors sit/)) }] }],
     ],
   },
+  {
+    // What each module says in its SPD: the demo case replays public SPD dumps, no server was read.
+    name: 'spd', dir: 'testdata/spd', cols: 80, size: 'auto',
+    panes: [[{ runs: [{ argv: ['my', 'spd', '--root', SPD] }] }]],
+  },
 ];
 
 // The report: the first screen of the HTML file, at 1280 x 800 CSS pixels. The case is the copy of
@@ -108,6 +124,17 @@ const REPORT = {
   import: ['my', 'import', MULTI, `${MULTI}/journal-all.json`, '-o'],
   argv: ['my', 'report'],
 };
+
+// Parts of a report as a reader sees them in a browser 1280 CSS pixels wide, the
+// window of the report capture: section 2 from its heading (without the rule
+// above it) to the end of the board, cut 24 px outside what it shows. `hover` puts the
+// pointer on the stick of a slot, so the card of that module is open; `block`
+// also keeps the block of population findings under the board, up to that many
+// findings. Each crop is taken at the scale that makes it 1600 px wide.
+const CROPS = [
+  { name: 'report-board', dir: 'testdata/real', root: MULTI, hover: 'CPU0_D1' },
+  { name: 'population', dir: 'testdata/explorer', root: POPULATION, block: 3 },
+];
 
 // Blocks of text on the page.
 const BLOCKS = [
@@ -156,6 +183,10 @@ const chrome = process.env.CHROME || '/Applications/Google Chrome.app/Contents/M
 const cwebp = process.env.CWEBP || 'cwebp';
 
 const sh = (cmd, argv, o = {}) => execFileSync(cmd, argv, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], ...o });
+
+// One Chromium of Playwright for all crops, started when the first one needs it.
+let chromium = null;
+const browser = () => (chromium ||= playwright().chromium.launch());
 
 if (!args.includes('--no-fetch')) sh('git', ['-C', repo, 'fetch', '-q', 'origin']);
 const sha = sh('git', ['-C', repo, 'rev-parse', '--verify', `${ref}^{commit}`]).trim();
@@ -245,6 +276,16 @@ try {
     screenshot(report, rpng, 1280, 800, 1.25);
     webp(rpng, join(out, `${REPORT.name}.webp`));
 
+    for (const c of CROPS) {
+      const html = join(out, `${c.name}-report.html`);
+      run(c.dir, 100, { argv: ['my', 'report', '--root', c.root, '-o', html], quiet: true });
+      const png = join(out, `${c.name}.png`);
+      const r = await reportCrop(browser(), html, png, c);
+      outputs.push(r.text);
+      sizes[c.name] = [r.width, r.height];
+      webp(png, join(out, `${c.name}.webp`));
+    }
+
     const file = `site/${lang}/index.html`;
     let index = readFileSync(join(root, file), 'utf8');
     for (const b of BLOCKS) {
@@ -288,7 +329,7 @@ try {
   for (const lang of langs) {
     mkdirSync(join(site, 'captures', lang), { recursive: true });
     if (shots) mkdirSync(join(shots, lang), { recursive: true });
-    for (const f of [...FIGURES, REPORT]) {
+    for (const f of [...FIGURES, REPORT, ...CROPS]) {
       copyFileSync(join(work, lang, `${f.name}.webp`), join(site, 'captures', lang, `${f.name}.webp`));
       if (shots) copyFileSync(join(work, lang, `${f.name}.png`), join(shots, lang, `${f.name}.png`));
       written.push(`captures/${lang}/${f.name}.webp`);
@@ -296,6 +337,7 @@ try {
   }
   console.log(`written: ${written.join(', ')}; ${BLOCKS.length} blocks in ${Object.keys(pages).join(', ')}`);
 } finally {
+  if (chromium) await chromium.then((b) => b.close(), () => {});
   rmSync(tmp, { recursive: true, force: true });
 }
 
@@ -447,4 +489,102 @@ function autoHeight(page) {
 
 function webp(png, out) {
   execFileSync(cwebp, ['-quiet', '-q', '90', '-m', '6', png, '-o', out]);
+}
+
+// ---- crops of the report ----------------------------------------------------
+
+function playwright() {
+  const reqs = [createRequire(import.meta.url)];
+  try { reqs.push(createRequire(join(sh('npm', ['root', '-g']).trim(), 'noop.js'))); } catch { /* no npm */ }
+  for (const req of reqs) {
+    for (const name of ['playwright', '@playwright/test']) {
+      try { return req(name); } catch { /* next */ }
+    }
+  }
+  throw new Error('the crops of the report need Playwright: npm install -g playwright, then npx playwright install chromium');
+}
+
+// Takes a crop of section 2 of a report (see CROPS) into png; returns its size
+// in pixels and the text it shows.
+async function reportCrop(launched, html, png, c) {
+  const b = await launched;
+  // Measured once at scale 1, then taken at the scale that makes the crop 1600 px wide.
+  let clip = null;
+  for (const scale of [1, 0]) {
+    const ctx = await b.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: scale || 1600 / clip.width });
+    try {
+      const page = await ctx.newPage();
+      const errors = [];
+      page.on('pageerror', (e) => errors.push(String(e)));
+      page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+      await page.goto(pathToFileURL(html).href);
+      await page.evaluate(() => document.fonts.ready);
+      // The heading of the section at the top of the window.
+      const found = await page.evaluate(() => {
+        const fig = document.querySelector('figure.board');
+        const h = fig && fig.closest('section') && fig.closest('section').querySelector('h2');
+        if (!h) return false;
+        window.scrollTo(0, h.getBoundingClientRect().top + window.scrollY - 16);
+        return true;
+      });
+      if (!found) throw new Error(`${c.name}: the report has no board in a section with a heading`);
+      if (c.hover) {
+        // The pointer on the right edge of the stick, a quarter down: the card opens
+        // beside the stick and below the marks of its neighbours.
+        const stick = page.locator(`[data-card][aria-label^="${c.hover}:"] rect.cell`).first();
+        const s = await stick.boundingBox();
+        if (!s) throw new Error(`${c.name}: no stick of ${c.hover} on the board`);
+        await page.mouse.move(s.x + s.width - 3, s.y + s.height / 4);
+        await page.waitForTimeout(300);
+      }
+      const box = await page.evaluate(({ hover, block }) => {
+        const r = (e) => { const b = e.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, left: b.left, right: b.right }; };
+        const fig = document.querySelector('figure.board');
+        const sec = fig.closest('section');
+        const h = sec.querySelector('h2');
+        const parts = [r(fig)];
+        const shown = [h, fig];
+        let last = fig;
+        if (hover) {
+          const card = document.getElementById('mx-hover');
+          if (!card || card.hidden) return { error: `no card under the pointer on ${hover}` };
+          parts.push(r(card));
+          shown.push(card);
+        }
+        if (block) {
+          const pop = sec.querySelector('div.population');
+          if (!pop) return { error: 'no block of population findings under the board' };
+          const items = pop.querySelectorAll('li');
+          const end = items.length > block ? r(items[block - 1]).bottom : r(pop).bottom;
+          parts.push({ ...r(pop), bottom: end });
+          shown.push(pop);
+          last = pop;
+          for (let e = fig.nextElementSibling; e && e !== pop; e = e.nextElementSibling) shown.push(e);
+        }
+        // The crop ends half way to what follows, so nothing of the next part shows.
+        let next = last.nextElementSibling;
+        while (next && (next.hidden || next.getBoundingClientRect().height === 0)) next = next.nextElementSibling;
+        const bottom = Math.max(...parts.map((p) => p.bottom));
+        const gap = next ? Math.min(16, Math.max(0, (r(next).top - bottom) / 2)) : 16;
+        const box = {
+          left: Math.min(...parts.map((p) => p.left)) - 24, right: Math.max(...parts.map((p) => p.right)) + 24,
+          // From just below the rule above the heading.
+          top: r(h).top + parseFloat(getComputedStyle(h).borderTopWidth) + Math.max(0, parseFloat(getComputedStyle(h).paddingTop) - 12),
+          bottom: bottom + gap,
+        };
+        const text = shown.map((e) => e.innerText).join('\n');
+        return { box, text, inner: [window.innerWidth, window.innerHeight] };
+      }, { hover: c.hover || '', block: c.block || 0 });
+      if (box.error) throw new Error(`${c.name}: ${box.error}`);
+      if (errors.length) throw new Error(`${c.name}: the report logs errors: ${errors.join('; ')}`);
+      const { left, right, top, bottom } = box.box;
+      if (left < 0 || top < 0 || right > box.inner[0] || bottom > box.inner[1]) throw new Error(`${c.name}: the crop ${JSON.stringify(box.box)} is not inside the window`);
+      if (scale) { clip = { x: left, y: top, width: right - left, height: bottom - top }; continue; }
+      await page.screenshot({ path: png, clip });
+      const head = readFileSync(png); // the size of a PNG is in its IHDR chunk
+      return { width: head.readUInt32BE(16), height: head.readUInt32BE(20), text: box.text };
+    } finally {
+      await ctx.close();
+    }
+  }
 }
