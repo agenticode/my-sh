@@ -29,7 +29,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="/fonts/SUIT-Variable-2.040.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/ko-wrap.css?v=c188c47e">
-<link rel="stylesheet" href="/css/site.css?v=43a3ba1b">
+<link rel="stylesheet" href="/css/site.css?v=8bda0f52">
 <script src="/js/site.js?v=ee0c8c34"></script>
 </head>
 <body>
@@ -78,7 +78,7 @@
       </div>
       <pre class="term term-cmd hero-install" data-enter style="--e:4" tabindex="0" role="region" aria-label="Install command"><code><span class="ps">$ </span>curl -fsSL https://my.sh/get | sh</code></pre>
     </div>
-    <div class="hero-art" data-enter style="--e:5">
+    <figure class="hero-art" data-enter style="--e:5">
       <!-- run:hero --><pre class="term term-out term-hero" tabindex="0" role="region" aria-label="Output of my: slot map and DIMM table" style="--cols:53"><code><span class="ps">$ </span>my --root 6.19.10-ghes-multi
 host finding: <span class="c33">consider replacement</span>
 
@@ -90,7 +90,11 @@ host finding: <span class="c33">consider replacement</span>
  2  CPU0_D1  10  <span class="b c31"> 1</span>  row         <span class="c33">consider replacement</span>
  3  CPU0_B1  10   0  column      <span class="c33">consider replacement</span>
  4  CPU0_A1   3   0  single-bit  <span class="c36">observe</span></code></pre><!-- /run:hero -->
-    </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Slot map and DIMM table</h2>
+        <p class="cap-d">Which slots hold the DIMMs with errors, the riskiest first.</p>
+      </figcaption>
+    </figure>
   </div>
 </section>
 
@@ -100,42 +104,73 @@ host finding: <span class="c33">consider replacement</span>
       <div class="capture-frame" style="--ar:1600 / 799">
         <img src="/captures/en/dimm.webp" alt="Screen of my dimm --root 6.19.10-ghes-multi CPU0_B1. Consider replacement, rule R-ROW-03, a column fault at rank1 dev5 bg0 bank3 col 0x1c8. The bar below it shows how the errors in this bank split over 9 rows." width="1600" height="799" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">One DIMM in detail</h2>
+        <p class="cap-d">Pins the errors to a device and its rows, and says when to replace.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="address-map">
       <div class="capture-frame" style="--ar:1600 / 1223">
         <img src="/captures/en/address-map.webp" alt="Four my map screens. Top left, CPU0_A1: one cell at row 0x4d2e. Top right, CPU0_D1: cells along row 0x2b41 and one UE. Bottom left, CPU0_B1: cells down column 0x1c8. Bottom right, CPU0_E1: cells scattered over the bank." width="1600" height="1223" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Address map</h2>
+        <p class="cap-d">Tells cell, row, column and bank faults apart by their shape.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="repair">
       <div class="capture-frame" style="--ar:1600 / 1079">
         <img src="/captures/en/repair.webp" alt="Two screens of my dimm --root 7.3.0-cxl-repair. Top, cxl:mem1: observe, R-SOFT-01; its repair line reads memory sparing at rank0 bg1 bank2 row 0x1f40, 6 errors before, 0 after. Bottom, cxl:mem0: consider replacement, R-REP-02, 3 errors at rank1 bg3 bank0 row 0xa7c after the memory sparing; its repair line reads 6 errors before, 3 after." width="1600" height="1079" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Before and after a repair</h2>
+        <p class="cap-d">Flags a device for replacement when its repaired row fails again.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="boots-same">
       <div class="capture-frame" style="--ar:1600 / 754">
         <img src="/captures/en/boots-same.webp" alt="Screen of my open var/lib/my/ledger.db boots &#39;DIMM 0&#39;. Boots 1, 2 and 3 ended in a fatal hardware error, each with a UE at rank0 dev7 bg0 bank3 row 0x1a2f col 0x238 of DIMM 0. Boot 4 is running. The rule is R-LOOP-01." width="1600" height="754" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Stops on one cell</h2>
+        <p class="cap-d">Traces a reboot loop, boot by boot, to one cell of one DIMM.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="boots-spread">
       <div class="capture-frame" style="--ar:1600 / 932">
         <img src="/captures/en/boots-spread.webp" alt="Screen of my open var/lib/my/ledger.db boots and the host line of my why --oneline. Boots 2, 3 and 4 stopped, with the UE on CPU0_A1, CPU0_C1 and CPU0_E1 in turn. The host finding is hold replacement, rule R-LOOP-03. It says to check the logs of the processor and the board, the power supply, and what changed before the first stop." width="1600" height="932" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Another DIMM each boot</h2>
+        <p class="cap-d">When each stop hits another DIMM, holds the swap and points to the board.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="verdict-card">
       <div class="capture-frame" style="--ar:1600 / 843">
         <img src="/captures/en/verdict-card.webp" alt="Screen of my open var/lib/my/ledger.db why &#39;DIMM 0&#39;. DIMM 0 is replace now, rule R-UE-01. The evidence is R-LOOP-01 and two supporting lines. The next step is to replace the DIMM and attach a case bundle written from the kept ledger to the return. Confidence is high." width="1600" height="843" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Verdict and evidence</h2>
+        <p class="cap-d">Evidence for replace now, and the case bundle to attach to the return.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="preflight">
       <div class="capture-frame" style="--ar:1600 / 1244">
         <img src="/captures/en/preflight.webp" alt="Screen of my preflight --root 6.19.10-bert-loop. Check by check, it lists what a reset right after a fatal memory error would leave on this host. mce-bootlog, mce-print, bert and console are kept, erst-mce is none, reset-kind is info, and 7 checks that need the running host are unknown. No check would lose records." width="1600" height="1244" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Preflight before a reset</h2>
+        <p class="cap-d">Checks in advance which records survive a reset after a fatal error.</p>
+      </figcaption>
     </figure>
     <figure class="capture rise" data-capture="report">
-      <figcaption class="cap-label">HTML from <code>my report</code></figcaption>
       <div class="capture-frame">
         <img src="/captures/en/report.webp" alt="Summary of the HTML report written by my report. The finding for host lab-arm6 is consider replacement. The records cover 2026-11-14 to 2026-11-16 and 3 boots, with 35 CE and 1 UE." width="1600" height="1000" loading="lazy" decoding="async">
       </div>
+      <figcaption class="cap">
+        <h2 class="cap-t">Customer report in HTML</h2>
+        <p class="cap-d"><code>my report</code> puts the verdicts and figures in one file to hand over.</p>
+      </figcaption>
     </figure>
   </div>
 </section>
