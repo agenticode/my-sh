@@ -57,7 +57,9 @@ The banner logo loops between MemorY and MY.sh every 7.2 s. It animates only `tr
 
 ## Captures
 
-The overview is the hero and then the captures, one under another at the full width of the page, in this order: topology bars, address map, repair, same cell, another DIMM each boot, verdict card, preflight, report. Only the report has a label (its image holds no command line). On screens up to 30rem the hero screen and the captures reach both edges.
+The overview is the hero and then the captures, one under another at the full width of the page, in this order: topology bars, address map, repair, same cell, another DIMM each boot, verdict card, preflight, report. On screens up to 30rem the hero screen and the captures reach both edges.
+
+Under the hero screen and under each capture is a caption (`<figcaption class="cap">`): a title of two to five words and one line on the problem the screen solves, in small muted text. The captions are written by hand from what the screen shows. `tools/captures.mjs` leaves them as they are, so reread them when a screen changes.
 
 Every terminal screen on the page is output of MemorY: the figure images in `site/captures/` and the text block of the hero (the slot map and DIMM table). One command makes all of them:
 
