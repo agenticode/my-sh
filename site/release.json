@@ -1,15 +1,15 @@
 {
   "name": "MemorY",
-  "version": "v1.0.0",
-  "date": "2026-11-16",
-  "published": "2026-11-16T17:22:06Z",
-  "commit": "0a19e609ed4ecd4c91d7bc8f9a2fe8da692afce7",
+  "version": "v1.1.0",
+  "date": "2026-11-17",
+  "published": "2026-11-17T19:31:26Z",
+  "commit": "1077cd516eb4d32cea3d9c0af9f8b63b850fea31",
   "repository": "https://github.com/agenticode/my",
-  "notes": "https://github.com/agenticode/my/releases/tag/v1.0.0",
-  "sums": {"file":"SHA256SUMS","url":"https://github.com/agenticode/my/releases/download/v1.0.0/SHA256SUMS","size":286},
+  "notes": "https://github.com/agenticode/my/releases/tag/v1.1.0",
+  "sums": {"file":"SHA256SUMS","url":"https://github.com/agenticode/my/releases/download/v1.1.0/SHA256SUMS","size":286},
   "archives": [
-    {"os":"linux","arch":"amd64","file":"my_v1.0.0_linux_amd64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_amd64.tar.gz","size":8307514,"sha256":"ae44bdb1781b6fc02b0c64ad14820eb0ba038f6f6b6feaf9c7a97fe2fd2da5c6"},
-    {"os":"linux","arch":"arm64","file":"my_v1.0.0_linux_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_linux_arm64.tar.gz","size":7621635,"sha256":"3a16c45eb2f3bab6cf932fe20bb7b2d06a00f11ada9efb2428f1b6bc23ae1679"},
-    {"os":"darwin","arch":"arm64","file":"my_v1.0.0_darwin_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.0.0/my_v1.0.0_darwin_arm64.tar.gz","size":7792378,"sha256":"4b6fd335f437c5de2c94a5f4e8db0f37f5d7445f237dd7bfdf988a02300d09b7"}
+    {"os":"linux","arch":"amd64","file":"my_v1.1.0_linux_amd64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.1.0/my_v1.1.0_linux_amd64.tar.gz","size":8944709,"sha256":"82b58d1679842d5cb796f13240fe108de1602bf6263b3c911e71880c28e6c36c"},
+    {"os":"linux","arch":"arm64","file":"my_v1.1.0_linux_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.1.0/my_v1.1.0_linux_arm64.tar.gz","size":8207922,"sha256":"987e6e2765e5814c710207b8859243e92b2b496f4c4ae12af673093ad100e637"},
+    {"os":"darwin","arch":"arm64","file":"my_v1.1.0_darwin_arm64.tar.gz","url":"https://github.com/agenticode/my/releases/download/v1.1.0/my_v1.1.0_darwin_arm64.tar.gz","size":8399085,"sha256":"b1440d9d3b91580c5a8f50d6ae1b01691e8e8edd926da9544ce428fc86b208c3"}
   ]
 }
